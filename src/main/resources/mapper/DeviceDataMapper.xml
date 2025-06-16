@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kfblue.seh.mapper.DeviceDataMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.kfblue.seh.entity.DeviceData">
+        <id column="id" property="id"/>
+        <result column="XGateway" property="XGateway"/>
+        <result column="XTagName" property="XTagName"/>
+        <result column="XValue" property="XValue"/>
+        <result column="XQuality" property="XQuality"/>
+        <result column="XTimeStamp" property="XTimeStamp"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedBy"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="deleted" property="deleted"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <!-- 分页查询设备数据 -->
+    <select id="selectPageWithConditions" resultMap="BaseResultMap">
+        SELECT * FROM device_data
+        WHERE deleted = 0
+        <if test="XGateway != null and XGateway != ''">
+            AND XGateway = #{XGateway}
+        </if>
+        <if test="XTagName != null and XTagName != ''">
+            AND XTagName LIKE CONCAT('%', #{XTagName}, '%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND XTimeStamp <![CDATA[>=]]> #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND XTimeStamp <![CDATA[<=]]> #{endTime}
+        </if>
+        ORDER BY XTimeStamp DESC, id DESC
+    </select>
+
+    <!-- 根据网关和标签名称获取最新数据 -->
+    <select id="selectLatestByGatewayAndTag" resultMap="BaseResultMap">
+        SELECT * FROM device_data
+        WHERE deleted = 0
+        AND XGateway = #{XGateway}
+        AND XTagName = #{XTagName}
+        ORDER BY XTimeStamp DESC, id DESC
+        LIMIT 1
+    </select>
+
+    <!-- 批量插入设备数据 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO device_data (
+            XGateway, XTagName, XValue, XQuality, XTimeStamp,
+            created_by, created_at, updated_by, updated_at, deleted, remark
+        ) VALUES
+        <foreach collection="dataList" item="item" separator=",">
+            (
+                #{item.XGateway}, #{item.XTagName}, #{item.XValue},
+                #{item.XQuality}, #{item.XTimeStamp},
+                #{item.createdBy}, #{item.createdAt}, #{item.updatedBy},
+                #{item.updatedAt}, #{item.deleted}, #{item.remark}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 根据时间范围删除历史数据 -->
+    <delete id="deleteByTimeRange">
+        DELETE FROM device_data
+        WHERE XTimeStamp <![CDATA[<]]> #{beforeTime}
+    </delete>
+
+</mapper>

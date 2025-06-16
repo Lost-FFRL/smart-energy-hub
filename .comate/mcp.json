@@ -17,9 +17,9 @@
             "env": {
                 "MYSQL_HOST": "localhost",
                 "MYSQL_PORT": "3306",
-                "MYSQL_USER": "your_username",
-                "MYSQL_PASSWORD": "your_password",
-                "MYSQL_DATABASE": "your_database"
+                "MYSQL_USER": "root",
+                "MYSQL_PASSWORD": "local2026",
+                "MYSQL_DATABASE": "smart-energy-hub"
             }
         },
         "memory": {

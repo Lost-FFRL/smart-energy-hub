@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kfblue.seh.mapper.DemoMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="BaseResultMap" type="com.kfblue.seh.entity.Demo">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="INTEGER"/>
+        <result column="sort_order" property="sortOrder" jdbcType="INTEGER"/>
+        <result column="created_by" property="createdBy" jdbcType="VARCHAR"/>
+        <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+        <result column="updated_by" property="updatedBy" jdbcType="VARCHAR"/>
+        <result column="updated_at" property="updatedAt" jdbcType="TIMESTAMP"/>
+        <result column="deleted" property="deleted" jdbcType="TINYINT"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!-- 基础字段 -->
+    <sql id="Base_Column_List">
+        id, name, description, status, sort_order, created_by, created_at, updated_by, updated_at, deleted, remark
+    </sql>
+
+    <!-- 查询条件 -->
+    <sql id="Base_Where_Clause">
+        <where>
+            <if test="name != null and name != ''">
+                AND name LIKE CONCAT('%', #{name}, '%')
+            </if>
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="deleted != null">
+                AND deleted = #{deleted}
+            </if>
+        </where>
+    </sql>
+
+    <!-- 根据条件查询列表 -->
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM demo
+        <include refid="Base_Where_Clause"/>
+        ORDER BY sort_order ASC, created_at DESC
+    </select>
+
+    <!-- 根据名称查询 -->
+    <select id="selectByName" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM demo
+        WHERE name = #{name}
+        AND deleted = 0
+    </select>
+
+    <!-- 批量插入 -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO demo (name, description, status, sort_order, created_by, created_at, updated_by, updated_at, deleted, remark)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.name},
+            #{item.description},
+            #{item.status},
+            #{item.sortOrder},
+            #{item.createdBy},
+            #{item.createdAt},
+            #{item.updatedBy},
+            #{item.updatedAt},
+            #{item.deleted},
+            #{item.remark}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 批量更新状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE demo
+        SET status = #{status}, updated_by = #{updatedBy}, updated_at = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND deleted = 0
+    </update>
+
+</mapper>
