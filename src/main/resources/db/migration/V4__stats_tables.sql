@@ -2,7 +2,7 @@
 -- 基于MySQL 8.0+
 
 -- 1. 区域表
-CREATE TABLE `regions`
+CREATE TABLE IF NOT EXISTS `regions`
 (
     `id`           bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
     `region_code`  varchar(50)  NOT NULL COMMENT '区域编码',
@@ -28,7 +28,7 @@ CREATE TABLE `regions`
   DEFAULT CHARSET = utf8mb4 COMMENT ='区域表';
 
 -- 2. 设备表
-CREATE TABLE `devices`
+CREATE TABLE IF NOT EXISTS `devices`
 (
     `id`                     bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
     `device_code`            varchar(50)  NOT NULL COMMENT '设备编码',
@@ -65,7 +65,7 @@ CREATE TABLE `devices`
   DEFAULT CHARSET = utf8mb4 COMMENT ='设备表';
 
 -- 3. 设备记录值表（原始数据）
-CREATE TABLE `device_readings`
+CREATE TABLE IF NOT EXISTS `device_readings`
 (
     `id`              bigint         NOT NULL AUTO_INCREMENT COMMENT 'id',
     `device_id`       bigint         NOT NULL COMMENT '设备ID',
@@ -101,7 +101,7 @@ CREATE TABLE `device_readings`
   DEFAULT CHARSET = utf8mb4 COMMENT ='设备记录值表';
 
 -- 4. 设备日统计表（预聚合数据）
-CREATE TABLE `device_daily_statistics`
+CREATE TABLE IF NOT EXISTS `device_daily_statistics`
 (
     `id`                   bigint     NOT NULL AUTO_INCREMENT COMMENT 'id',
     `device_id`            bigint     NOT NULL COMMENT '设备ID',
@@ -147,95 +147,3 @@ CREATE TABLE `device_daily_statistics`
     CONSTRAINT `fk_daily_stats_device` FOREIGN KEY (`device_id`) REFERENCES `devices` (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='设备日统计表';
-
--- 5. 告警表
-CREATE TABLE `alarms`
-(
-    `id`               bigint       NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `device_id`        bigint       NOT NULL COMMENT '设备ID',
-    `alarm_code`       varchar(50)  NOT NULL COMMENT '告警编码',
-    `alarm_type`       varchar(50)  NOT NULL COMMENT '告警类型(offline:离线,threshold:阈值,malfunction:故障等)',
-    `alarm_level`      tinyint      NOT NULL COMMENT '告警级别(1:低,2:中,3:高,4:严重)',
-    `alarm_title`      varchar(200) NOT NULL COMMENT '告警标题',
-    `alarm_content`    text COMMENT '告警内容描述',
-    `alarm_value`      decimal(15, 4)        DEFAULT NULL COMMENT '告警值',
-    `threshold_value`  decimal(15, 4)        DEFAULT NULL COMMENT '阈值',
-    `alarm_time`       datetime     NOT NULL COMMENT '告警时间',
-    `alarm_status`     tinyint(1)   NOT NULL DEFAULT 0 COMMENT '告警状态(0:未处理,1:处理中,2:已处理,3:已忽略)',
-    `handle_user`      varchar(64)           DEFAULT NULL COMMENT '处理人',
-    `handle_time`      datetime              DEFAULT NULL COMMENT '处理时间',
-    `handle_result`    text                  DEFAULT NULL COMMENT '处理结果',
-    `auto_clear`       tinyint(1)            DEFAULT 0 COMMENT '是否自动清除(0:否,1:是)',
-    `clear_time`       datetime              DEFAULT NULL COMMENT '清除时间',
-    `duration_minutes` int                   DEFAULT NULL COMMENT '持续时长(分钟)',
-    `created_by`       varchar(64)           DEFAULT NULL COMMENT '创建人',
-    `created_at`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_by`       varchar(64)           DEFAULT NULL COMMENT '修改人',
-    `updated_at`       datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-    `deleted`          tinyint(1)   NOT NULL DEFAULT 0 COMMENT '逻辑删除标记(0:正常,1:删除)',
-    `remark`           varchar(500)          DEFAULT NULL COMMENT '备注信息',
-    PRIMARY KEY (`id`),
-    KEY `idx_device_alarm_time` (`device_id`, `alarm_time`),
-    KEY `idx_alarm_type` (`alarm_type`),
-    KEY `idx_alarm_level` (`alarm_level`),
-    KEY `idx_alarm_status` (`alarm_status`),
-    KEY `idx_alarm_time` (`alarm_time`),
-    CONSTRAINT `fk_alarms_device` FOREIGN KEY (`device_id`) REFERENCES `devices` (`id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4 COMMENT ='告警表';
-
--- 创建索引优化查询性能
--- 设备记录值表额外索引（用于时间范围查询）
-CREATE INDEX `idx_readings_device_time_range` ON `device_readings` (`device_id`, `reading_time`, `current_value`);
-
--- 告警表复合索引（用于统计查询）
-CREATE INDEX `idx_alarms_stats` ON `alarms` (`alarm_time`, `alarm_level`, `alarm_status`);
-
--- 日统计表时间范围索引
-CREATE INDEX `idx_daily_stats_time_range` ON `device_daily_statistics` (`stat_date`, `device_id`, `daily_consumption`);
-
--- 视图：设备在线状态统计
-CREATE VIEW `v_device_online_stats` AS
-SELECT d.device_type,
-       r.region_name,
-       COUNT(*)                                                                          as total_devices,
-       SUM(CASE WHEN d.online_status = 1 THEN 1 ELSE 0 END)                              as online_devices,
-       SUM(CASE WHEN d.online_status = 0 THEN 1 ELSE 0 END)                              as offline_devices,
-       ROUND(SUM(CASE WHEN d.online_status = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) as online_rate
-FROM devices d
-         LEFT JOIN regions r ON d.region_id = r.id
-WHERE d.deleted = 0
-  AND d.status = 1
-GROUP BY d.device_type, r.region_name;
-
--- 视图：今日能耗统计
-CREATE VIEW `v_today_consumption` AS
-SELECT d.device_type,
-       r.region_name,
-       COUNT(ds.id)              as device_count,
-       SUM(ds.daily_consumption) as total_consumption,
-       AVG(ds.daily_consumption) as avg_consumption,
-       SUM(ds.cost_amount)       as total_cost
-FROM device_daily_statistics ds
-         LEFT JOIN devices d ON ds.device_id = d.id
-         LEFT JOIN regions r ON d.region_id = r.id
-WHERE ds.stat_date = CURDATE()
-  AND d.deleted = 0
-  AND d.status = 1
-GROUP BY d.device_type, r.region_name;
-
--- 视图：告警统计
-CREATE VIEW `v_alarm_stats` AS
-SELECT d.device_type,
-       r.region_name,
-       a.alarm_level,
-       a.alarm_status,
-       COUNT(*)          as alarm_count,
-       MIN(a.alarm_time) as first_alarm_time,
-       MAX(a.alarm_time) as last_alarm_time
-FROM alarms a
-         LEFT JOIN devices d ON a.device_id = d.id
-         LEFT JOIN regions r ON d.region_id = r.id
-WHERE a.deleted = 0
-  AND a.alarm_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-GROUP BY d.device_type, r.region_name, a.alarm_level, a.alarm_status;
