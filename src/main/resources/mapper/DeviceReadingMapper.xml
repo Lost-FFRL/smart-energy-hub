@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kfblue.seh.mapper.DeviceReadingMapper">
+
+    <select id="selectHourValues" resultType="com.kfblue.seh.vo.HourValueVO">
+        SELECT HOUR(dr.reading_time)                as hour,
+               COALESCE(SUM(dr.increment_value), 0) as value
+        FROM device_readings dr
+                 left JOIN devices d ON dr.device_id = d.id
+        WHERE d.device_type = #{deviceType}
+          AND DATE(dr.reading_time) = #{statsDate}
+        GROUP BY HOUR(dr.reading_time)
+        ORDER BY hour
+    </select>
+    <select id="getHourValue" resultType="java.lang.Double">
+        SELECT COALESCE(SUM(dr.increment_value), 0.0) as value
+        FROM device_readings dr
+                 LEFT JOIN devices d ON dr.device_id = d.id
+        WHERE d.device_type = #{deviceType}
+          AND DATE_FORMAT(dr.reading_time, '%Y-%m-%d %H') = DATE_FORMAT(#{time}, '%Y-%m-%d %H')
+    </select>
+    <select id="getDateValue" resultType="java.lang.Double">
+        SELECT COALESCE(SUM(dr.increment_value), 0.0) as value
+        FROM device_readings dr
+        LEFT JOIN devices d ON dr.device_id = d.id
+        <where>
+            <if test="deviceType != null">
+                AND d.device_type = #{deviceType}
+            </if>
+            <if test="statsDate != null">
+                AND DATE(dr.reading_time) = #{statsDate}
+            </if>
+            <if test="regionId != null">
+                AND d.region_id = #{regionId}
+            </if>
+        </where>
+    </select>
+    <select id="dayStats" resultType="com.kfblue.seh.vo.DayValueVO">
+        SELECT DATE(dr.reading_time) as date,
+        COALESCE(SUM(dr.increment_value), 0.0) as value
+        FROM device_readings dr
+        LEFT JOIN devices d ON dr.device_id = d.id
+        WHERE d.device_type = #{deviceType}
+        AND DATE(dr.reading_time) &gt;= #{startDate}
+        AND DATE(dr.reading_time) &lt;= #{endDate}
+        <if test="regionId != null">
+            AND d.region_id = #{regionId}
+        </if>
+        GROUP BY DATE(dr.reading_time)
+        ORDER BY DATE(dr.reading_time)
+    </select>
+    <select id="selectDayRank" resultType="com.kfblue.seh.vo.RankVO">
+        SELECT r.id,
+               r.region_name                          as name,
+               COALESCE(SUM(dr.increment_value), 0.0) as value
+        FROM regions r
+                 LEFT JOIN devices d ON r.id = d.region_id AND d.device_type = #{deviceType}
+                 LEFT JOIN device_readings dr ON d.id = dr.device_id
+        where d.device_type = #{deviceType}
+          AND DATE(dr.reading_time) = #{date}
+        GROUP BY r.id, r.region_name
+        ORDER BY value DESC
+        LIMIT #{limit}
+    </select>
+    <select id="selectHourRank" resultType="com.kfblue.seh.vo.RankVO">
+        SELECT r.id,
+               r.region_name                          as name,
+               COALESCE(SUM(dr.increment_value), 0.0) as value
+        FROM regions r
+                 LEFT JOIN devices d ON r.id = d.region_id AND d.device_type = #{deviceType}
+                 LEFT JOIN device_readings dr ON d.id = dr.device_id
+        where d.device_type = #{deviceType}
+          AND DATE_FORMAT(dr.reading_time, '%Y-%m-%d %H') = DATE_FORMAT(#{time}, '%Y-%m-%d %H')
+        GROUP BY r.id, r.region_name
+    </select>
+</mapper>

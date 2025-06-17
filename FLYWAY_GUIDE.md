@@ -49,8 +49,8 @@ V{版本号}__{描述}.sql
 ```
 
 示例：
-- `V1__Create_demo_table.sql` - 创建 demo 表
-- `V2__Insert_demo_data.sql` - 插入初始数据
+- `V1__system_table.sql` - 创建 demo 表
+- `V2__demo.sql` - 插入初始数据
 - `V3__Add_user_table.sql` - 添加用户表
 - `V4__Alter_demo_add_column.sql` - 修改 demo 表添加字段
 
@@ -70,7 +70,7 @@ src/main/resources/db/migration/
 
 ## 现有迁移脚本
 
-### V1__Create_demo_table.sql
+### V1__system_table.sql
 创建 demo 表，包含以下字段：
 - `id` - 主键，自增
 - `name` - 名称
@@ -84,7 +84,7 @@ src/main/resources/db/migration/
 - `deleted` - 逻辑删除标记
 - `remark` - 备注信息
 
-### V2__Insert_demo_data.sql
+### V2__demo.sql
 插入 5 条测试数据到 demo 表中。
 
 ## 使用指南

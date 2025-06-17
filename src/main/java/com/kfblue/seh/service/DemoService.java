@@ -1,49 +1,47 @@
 package com.kfblue.seh.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kfblue.seh.entity.Demo;
+import com.kfblue.seh.mapper.DemoMapper;
+import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
- * Demo服务接口
+ * Demo服务实现类
  */
-public interface DemoService extends IService<Demo> {
+@Service
+public class DemoService extends ServiceImpl<DemoMapper, Demo> {
     
-    /**
-     * 分页查询Demo
-     * @param page 分页参数
-     * @param name 名称(可选)
-     * @param status 状态(可选)
-     * @return 分页结果
-     */
-    IPage<Demo> page(Page<Demo> page, String name, Integer status);
+  
+    public IPage<Demo> page(Page<Demo> page, String name, Integer status) {
+        LambdaQueryWrapper<Demo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.like(StringUtils.hasText(name), Demo::getName, name)
+               .eq(status != null, Demo::getStatus, status)
+               .orderByAsc(Demo::getSortOrder)
+               .orderByDesc(Demo::getCreatedAt);
+        return this.page(page, wrapper);
+    }
     
-    /**
-     * 根据ID获取Demo
-     * @param id ID
-     * @return Demo对象
-     */
-    Demo getById(Long id);
+  
+    public Demo getById(Long id) {
+        return super.getById(id);
+    }
     
-    /**
-     * 保存Demo
-     * @param demo Demo对象
-     * @return 是否成功
-     */
-    boolean save(Demo demo);
+  
+    public boolean save(Demo demo) {
+        return super.save(demo);
+    }
     
-    /**
-     * 更新Demo
-     * @param demo Demo对象
-     * @return 是否成功
-     */
-    boolean update(Demo demo);
+  
+    public boolean update(Demo demo) {
+        return super.updateById(demo);
+    }
     
-    /**
-     * 删除Demo
-     * @param id ID
-     * @return 是否成功
-     */
-    boolean delete(Long id);
+  
+    public boolean delete(Long id) {
+        return super.removeById(id);
+    }
 }

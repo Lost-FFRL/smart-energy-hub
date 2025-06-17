@@ -59,6 +59,24 @@ dto/ vo/ config/ exception/
 4. **分页查询**：大数据量必须分页
 5. **事务管理**：涉及多表操作加@Transactional
 
+## 常用的工具类
+- Hutool：常用工具类集合
+- Lombok：简化代码
+
+## 引入 Bean
+采用注解：@RequiredArgsConstructor 方式
+
+## 接口返回统一格式
+Result<T>
+
+```
+{
+    "code": 200,
+    "msg": "success",
+    "data": {}
+}
+```
+
 ## AI开发指令
 生成代码时：
 - 自动创建包含6基础字段的表结构
