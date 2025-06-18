@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "用量排行榜")
-public class RankVO {
+@Schema(description = "用量分布")
+public class DistributionVO {
 
     @Schema(description = "区域")
     private String region;
@@ -17,6 +17,5 @@ public class RankVO {
     private Long id;
 
     @Schema(description = "用量")
-    private BigDecimal current;
-
+    private BigDecimal value;
 }

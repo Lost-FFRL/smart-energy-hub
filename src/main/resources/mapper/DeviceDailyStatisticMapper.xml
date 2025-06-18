@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kfblue.seh.mapper.DeviceDailyStatisticMapper">
+
+    <!-- 继承BaseMapper的基本CRUD方法 -->
+
+    <select id="summary" resultType="java.math.BigDecimal">
+        SELECT SUM(dds.daily_consumption)
+        FROM device_daily_statistics dds
+                 left join devices d on d.id = dds.device_id
+        WHERE d.device_type = #{deviceType}
+          AND dds.stat_date BETWEEN #{startDate} AND #{endDate}
+    </select>
+    <select id="distribution" resultType="com.kfblue.seh.vo.DistributionVO">
+        SELECT r.id,
+        r.region_name as name,
+        COALESCE(SUM(dds.daily_consumption), 0.0) as value
+        FROM regions r
+        LEFT JOIN devices d ON r.id = d.region_id AND d.device_type = #{deviceType}
+        LEFT JOIN device_daily_statistics dds ON d.id = dds.device_id
+        <where>
+            <if test="deviceType != null and deviceType != ''">
+                d.device_type = #{deviceType}
+            </if>
+            <if test="startDate != null and endDate != null">
+                AND dds.stat_date BETWEEN #{startDate} AND #{endDate}
+            </if>
+        </where>
+        GROUP BY r.id, r.region_name
+        ORDER BY value DESC
+        <if test="top != null">
+            `LIMIT` #{top}
+        </if>
+    </select>
+
+    <select id="monthTrend" resultType="com.kfblue.seh.vo.MonthValueVO">
+        SELECT YEAR(dds.stat_date) as year,
+        MONTH(dds.stat_date) AS month,
+        COALESCE(SUM(dds.daily_consumption), 0.0) as value
+        FROM device_daily_statistics dds
+        left join devices d on d.id = dds.device_id
+        WHERE
+        dds.stat_date BETWEEN #{startDate} AND #{endDate}
+        <if test="deviceType != null and deviceType != ''">
+            AND d.device_type = #{deviceType}
+        </if>
+        GROUP BY YEAR(dds.stat_date), MONTH(stat_date)
+        ORDER BY YEAR(dds.stat_date), MONTH(stat_date);
+    </select>
+
+</mapper>

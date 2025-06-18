@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName("device_daily_statistics")
-public class DeviceDailyStatistic extends BaseEntity {
+public class DeviceDailyStatistics extends BaseEntity {
 
     /**
      * 设备ID
