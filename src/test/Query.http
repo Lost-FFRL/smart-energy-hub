@@ -1,0 +1,17 @@
+###
+GET {{host}}/energy/query/regions
+
+###
+GET {{host}}/energy/query/summary?deviceType=gas&date=2025-06-18&regionId=1
+
+###
+GET {{host}}/energy/query/trend/hour?deviceType=gas&date=2025-06-18&regionId=1
+
+###
+GET {{host}}/energy/query/trend/day?deviceType=gas&date=2025-06-18&regionId=1
+
+###
+GET {{host}}/energy/query/yoy?deviceType=gas&date=2025-06-18&regionId=1
+
+###
+GET {{host}}/energy/query/distribution?deviceType=gas&date=2025-06-18&regionId=1
