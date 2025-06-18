@@ -1,0 +1,92 @@
+### 生成指定日期范围的设备数据
+
+# 生成2025年1月1日到6月18日的数据
+POST {{host}}/test/device-data/generate-date-range
+Content-Type: application/x-www-form-urlencoded
+
+startDate=2025-06-01&endDate=2025-06-18
+
+###
+
+# 生成2025年1月份的数据
+POST {{host}}/test/device-data/generate-date-range
+Content-Type: application/x-www-form-urlencoded
+
+startDate=2025-01-01&endDate=2025-01-31
+
+###
+
+# 生成最近7天的数据
+POST {{host}}/test/device-data/generate-date-range
+Content-Type: application/x-www-form-urlencoded
+
+startDate=2024-12-11&endDate=2024-12-18
+
+###
+
+# 手动生成当前时间的设备数据（原有功能）
+POST {{host}}/test/device-data/generate
+
+###
+
+# 手动计算指定日期的日统计
+POST {{host}}/test/device-data/calculate-statistics
+Content-Type: application/x-www-form-urlencoded
+
+date=2025-06-18
+
+###
+
+# 手动计算指定日期的日统计
+POST {{host}}/test/device-data/calculate-statistics-range
+Content-Type: application/x-www-form-urlencoded
+
+startDate=2025-06-01&endDate=2025-06-17
+
+###
+
+### 手动计算日统计
+POST {{host}}/test/device-data/calculate-statistics?date=2025-01-15
+Content-Type: application/json
+
+###
+
+### 查询设备日统计数据（按设备ID）
+GET {{host}}/test/device-data/daily-statistics?deviceId=1&startDate=2025-01-01&endDate=2025-01-31
+Content-Type: application/json
+
+###
+
+### 查询日统计汇总数据（按设备类型）
+GET {{host}}/test/device-data/daily-statistics/summary?deviceType=electric&startDate=2025-01-01&endDate=2025-01-31
+Content-Type: application/json
+
+###
+
+### 查询日统计汇总数据（按设备类型和区域）
+GET {{host}}/test/device-data/daily-statistics/summary?deviceType=water&startDate=2025-01-01&endDate=2025-01-31&regionIds=1,2,3
+Content-Type: application/json
+
+###
+
+### 查询日统计趋势数据（按设备类型）
+GET {{host}}/test/device-data/daily-statistics/trend?deviceType=electric&startDate=2025-01-01&endDate=2025-01-31
+Content-Type: application/json
+
+###
+
+### 查询日统计趋势数据（按设备类型和区域）
+GET {{host}}/test/device-data/daily-statistics/trend?deviceType=gas&startDate=2025-01-01&endDate=2025-01-31&regionIds=1,2
+Content-Type: application/json
+
+###
+
+### 批量计算日期范围的按天统计数据
+POST {{host}}/test/device-data/calculate-statistics-range?startDate=2025-01-01&endDate=2025-01-31
+Content-Type: application/json
+
+###
+
+### 批量计算日期范围的按天统计数据（短期范围）
+POST {{host}}/test/device-data/calculate-statistics-range?startDate=2025-06-01&endDate=2025-06-07
+Content-Type: application/json

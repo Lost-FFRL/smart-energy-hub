@@ -108,30 +108,30 @@ public class DeviceDailyStatisticService extends ServiceImpl<DeviceDailyStatisti
         BigDecimal dailyConsumption = lastReading.getCurrentValue().subtract(firstReading.getCurrentValue());
         statistics.setDailyConsumption(dailyConsumption);
         
-        // 计算瞬时值统计
-        BigDecimal maxInstantValue = readings.stream()
+        // 计算峰值和谷值统计
+        BigDecimal peakValue = readings.stream()
             .map(DeviceReading::getIncrementValue)
             .max(BigDecimal::compareTo)
             .orElse(BigDecimal.ZERO);
         
-        BigDecimal minInstantValue = readings.stream()
+        BigDecimal valleyValue = readings.stream()
             .map(DeviceReading::getIncrementValue)
             .min(BigDecimal::compareTo)
             .orElse(BigDecimal.ZERO);
         
-        BigDecimal avgInstantValue = readings.stream()
+        BigDecimal avgValue = readings.stream()
             .map(DeviceReading::getIncrementValue)
             .reduce(BigDecimal.ZERO, BigDecimal::add)
             .divide(BigDecimal.valueOf(readings.size()), 4, RoundingMode.HALF_UP);
         
-        statistics.setMaxInstantValue(maxInstantValue);
-        statistics.setMinInstantValue(minInstantValue);
-        statistics.setAvgInstantValue(avgInstantValue);
+        statistics.setPeakValue(peakValue);
+        statistics.setValleyValue(valleyValue);
+        statistics.setAvgValue(avgValue);
         
-        // 设置数据点数量
-        statistics.setDataPointCount(readings.size());
+        // 设置读数次数
+        statistics.setReadingCount(readings.size());
         
-        // 计算异常数据点数量（这里简单定义为增量值为负数或过大的情况）
+        // 计算异常读数次数（这里简单定义为增量值为负数或过大的情况）
         long abnormalCount = readings.stream()
             .mapToLong(reading -> {
                 BigDecimal increment = reading.getIncrementValue();
@@ -139,20 +139,18 @@ public class DeviceDailyStatisticService extends ServiceImpl<DeviceDailyStatisti
                        increment.compareTo(BigDecimal.valueOf(100)) > 0) ? 1 : 0;
             })
             .sum();
-        statistics.setAbnormalDataCount((int) abnormalCount);
+        statistics.setAbnormalCount((int) abnormalCount);
+        statistics.setNormalCount(readings.size() - (int) abnormalCount);
         
-        // 计算数据完整率（假设每小时应该有一个数据点）
+        // 计算数据完整性（假设每小时应该有一个数据点）
         int expectedDataPoints = 24; // 一天24小时
-        BigDecimal integrityRate = BigDecimal.valueOf(readings.size())
+        BigDecimal dataIntegrity = BigDecimal.valueOf(readings.size())
             .divide(BigDecimal.valueOf(expectedDataPoints), 4, RoundingMode.HALF_UP)
             .multiply(BigDecimal.valueOf(100));
-        if (integrityRate.compareTo(BigDecimal.valueOf(100)) > 0) {
-            integrityRate = BigDecimal.valueOf(100);
+        if (dataIntegrity.compareTo(BigDecimal.valueOf(100)) > 0) {
+            dataIntegrity = BigDecimal.valueOf(100);
         }
-        statistics.setDataIntegrityRate(integrityRate);
-        
-        // 设置在线时长（分钟）
-        statistics.setOnlineDuration(readings.size() * 60); // 假设每个读数代表1小时，转换为分钟
+        statistics.setDataIntegrity(dataIntegrity);
         
         return statistics;
     }

@@ -46,63 +46,115 @@ public class DeviceDailyStatistics extends BaseEntity {
     private BigDecimal dailyConsumption;
 
     /**
-     * 最大瞬时值
+     * 日峰值
      */
-    private BigDecimal maxInstantValue;
+    private BigDecimal peakValue;
 
     /**
-     * 最小瞬时值
+     * 峰值时间
      */
-    private BigDecimal minInstantValue;
+    private java.time.LocalTime peakTime;
 
     /**
-     * 平均瞬时值
+     * 日谷值
      */
-    private BigDecimal avgInstantValue;
+    private BigDecimal valleyValue;
 
     /**
-     * 数据点数量
+     * 谷值时间
      */
-    private Integer dataPointCount;
+    private java.time.LocalTime valleyTime;
 
     /**
-     * 异常数据点数量
+     * 日均值
      */
-    private Integer abnormalDataCount;
+    private BigDecimal avgValue;
 
     /**
-     * 数据完整率(%)
+     * 读数次数
      */
-    private BigDecimal dataIntegrityRate;
+    private Integer readingCount;
 
     /**
-     * 在线时长(分钟)
+     * 正常读数次数
      */
-    private Integer onlineDuration;
+    private Integer normalCount;
 
     /**
-     * 离线时长(分钟)
+     * 异常读数次数
      */
-    private Integer offlineDuration;
+    private Integer abnormalCount;
 
     /**
-     * 在线率(%)
+     * 数据完整性(%)
      */
-    private BigDecimal onlineRate;
+    private BigDecimal dataIntegrity;
 
     /**
-     * 统计状态(0:统计中,1:已完成)
+     * 费用金额(元)
      */
-    private Integer statStatus;
+    private BigDecimal costAmount;
 
     /**
-     * 统计时间
+     * 单价(元/单位)
      */
-    private LocalDateTime statTime;
+    private BigDecimal unitPrice;
+
+    // 电表特有统计字段
+    /**
+     * 峰时用电量 - 仅电表
+     */
+    private BigDecimal peakConsumption;
 
     /**
-     * 逻辑删除标记(0:正常,1:删除)
+     * 平时用电量 - 仅电表
      */
-    @TableLogic
-    private Integer deleted;
+    private BigDecimal flatConsumption;
+
+    /**
+     * 谷时用电量 - 仅电表
+     */
+    private BigDecimal valleyConsumption;
+
+    /**
+     * 平均功率因数 - 仅电表
+     */
+    private BigDecimal avgPowerFactor;
+
+    // 热表特有统计字段
+    /**
+     * 平均供水温度 - 仅热表
+     */
+    private BigDecimal avgSupplyTemp;
+
+    /**
+     * 平均回水温度 - 仅热表
+     */
+    private BigDecimal avgReturnTemp;
+
+    /**
+     * 平均温差 - 仅热表
+     */
+    private BigDecimal avgTempDiff;
+
+    /**
+     * 累计流量 - 仅热表
+     */
+    private BigDecimal totalFlow;
+
+    // 气表特有统计字段
+    /**
+     * 平均压力 - 仅气表
+     */
+    private BigDecimal avgPressure;
+
+    /**
+     * 平均温度 - 仅气表
+     */
+    private BigDecimal avgTemperature;
+
+    /**
+     * 标况用气量 - 仅气表
+     */
+    private BigDecimal standardConsumption;
 }
