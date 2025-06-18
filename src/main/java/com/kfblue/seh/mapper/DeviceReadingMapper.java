@@ -1,5 +1,7 @@
 package com.kfblue.seh.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.kfblue.seh.entity.DeviceReading;
 import com.kfblue.seh.vo.DayValueVO;
 import com.kfblue.seh.vo.HourValueVO;
 import com.kfblue.seh.vo.RankVO;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 @Mapper
-public interface DeviceReadingMapper {
+public interface DeviceReadingMapper extends BaseMapper<DeviceReading> {
 
     List<HourValueVO> selectHourValues(@Param("deviceType") String deviceType,
                                        @Param("statsDate") LocalDate statsDate,
@@ -41,4 +43,18 @@ public interface DeviceReadingMapper {
     List<RankVO> selectHourRank(@Param("deviceType") String deviceType,
                                 @Param("time") LocalDateTime time,
                                 @Param("limit") Integer limit);
+    
+    /**
+     * 获取设备最后一次读数值
+     */
+    BigDecimal getLastReadingValue(@Param("deviceId") Long deviceId);
+    
+    /**
+     * 获取指定时间范围内的设备读数
+     */
+    List<DeviceReading> getReadingsByTimeRange(
+        @Param("deviceId") Long deviceId,
+        @Param("startTime") LocalDateTime startTime,
+        @Param("endTime") LocalDateTime endTime
+    );
 }

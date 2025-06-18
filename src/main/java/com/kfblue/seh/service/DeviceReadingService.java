@@ -1,5 +1,7 @@
 package com.kfblue.seh.service;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.kfblue.seh.entity.DeviceReading;
 import com.kfblue.seh.mapper.DeviceReadingMapper;
 import com.kfblue.seh.vo.DayValueVO;
 import com.kfblue.seh.vo.HourValueVO;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class DeviceReadingService {
+public class DeviceReadingService extends ServiceImpl<DeviceReadingMapper, DeviceReading> {
     private final DeviceReadingMapper deviceReadingMapper;
 
     public List<HourValueVO> selectHourValues(LocalDate date, String deviceType, Set<Long> recordIds) {
@@ -60,4 +62,38 @@ public class DeviceReadingService {
         return deviceReadingMapper.selectHourRank(deviceType, time, limit);
     }
 
+    /**
+     * 获取设备最后一次读数值
+     */
+    public BigDecimal getLastReadingValue(Long deviceId) {
+        return deviceReadingMapper.getLastReadingValue(deviceId);
+    }
+    
+    /**
+     * 保存设备读数
+     */
+    public boolean saveDeviceReading(DeviceReading reading) {
+        return this.save(reading);
+    }
+    
+    /**
+     * 保存单个设备读数
+     */
+    public boolean saveReading(DeviceReading reading) {
+        return this.save(reading);
+    }
+    
+    /**
+     * 批量保存设备读数
+     */
+    public boolean batchSaveDeviceReadings(List<DeviceReading> readings) {
+        return this.saveBatch(readings);
+    }
+    
+    /**
+     * 获取指定时间范围内的设备读数
+     */
+    public List<DeviceReading> getReadingsByTimeRange(Long deviceId, LocalDateTime startTime, LocalDateTime endTime) {
+        return deviceReadingMapper.getReadingsByTimeRange(deviceId, startTime, endTime);
+    }
 }
