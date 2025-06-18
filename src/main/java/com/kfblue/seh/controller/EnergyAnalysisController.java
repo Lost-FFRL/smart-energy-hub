@@ -5,7 +5,7 @@ import com.kfblue.seh.constant.DateTypeConsts;
 import com.kfblue.seh.service.DeviceDailyStatisticService;
 import com.kfblue.seh.service.DeviceReadingService;
 import com.kfblue.seh.service.DeviceService;
-import com.kfblue.seh.util.DateUtil;
+import com.kfblue.seh.util.DateUtils;
 import com.kfblue.seh.util.RateUtils;
 import com.kfblue.seh.vo.AnalysisSummaryVO;
 import com.kfblue.seh.vo.DistributionVO;
@@ -43,16 +43,16 @@ public class EnergyAnalysisController {
                                                 @RequestParam("timeDimension") String timeDimension) {
         AnalysisSummaryVO result = new AnalysisSummaryVO();
         LocalDate date = LocalDate.now();
-        LocalDate start = DateUtil.getStartTime(date, timeDimension);
-        LocalDate end = DateUtil.getEndTime(date, timeDimension);
-        result.setTotal(dailyStatisticService.summary(deviceType, start, end));
+        LocalDate start = DateUtils.getStartTime(date, timeDimension);
+        LocalDate end = DateUtils.getEndTime(date, timeDimension);
+        result.setTotal(dailyStatisticService.summary(deviceType, start, end, null));
         // 环比-上一个月度/季度/年度
-        start = DateUtil.getStartTime(start.minusDays(1), timeDimension);
-        end = DateUtil.getEndTime(start.minusDays(1), timeDimension);
-        result.setMomRate(RateUtils.calculateGrowthRate(result.getTotal(), dailyStatisticService.summary(deviceType, start, end)));
+        start = DateUtils.getStartTime(start.minusDays(1), timeDimension);
+        end = DateUtils.getEndTime(start.minusDays(1), timeDimension);
+        result.setMomRate(RateUtils.calculateGrowthRate(result.getTotal(), dailyStatisticService.summary(deviceType, start, end, null)));
         start = start.minusYears(1);
         end = end.minusYears(1);
-        result.setYoyRate(RateUtils.calculateGrowthRate(result.getTotal(), dailyStatisticService.summary(deviceType, start, end)));
+        result.setYoyRate(RateUtils.calculateGrowthRate(result.getTotal(), dailyStatisticService.summary(deviceType, start, end, null)));
         return Result.success(result);
     }
 
@@ -63,9 +63,9 @@ public class EnergyAnalysisController {
                                                      @Parameter(description = "时间维度：month-月度，quarter-季度，year-年度", required = true)
                                                      @RequestParam("timeDimension") String timeDimension) {
         LocalDate date = LocalDate.now();
-        LocalDate start = DateUtil.getStartTime(date, timeDimension);
-        LocalDate end = DateUtil.getEndTime(date, timeDimension);
-        return Result.success(dailyStatisticService.distribution(deviceType, start, end, null));
+        LocalDate start = DateUtils.getStartTime(date, timeDimension);
+        LocalDate end = DateUtils.getEndTime(date, timeDimension);
+        return Result.success(dailyStatisticService.distribution(deviceType, start, end, null, null));
     }
 
     @Operation(summary = "分析趋势", description = "获取用量分析趋势数据")
@@ -73,8 +73,8 @@ public class EnergyAnalysisController {
     public Result<List<MonthValueVO>> trend(@Parameter(description = "设备类型：water:水表,electric:电表,gas:气表,heat:热表", required = true)
                                             @RequestParam("deviceType") String deviceType) {
         LocalDate date = LocalDate.now();
-        LocalDate start = DateUtil.getStartTime(date, DateTypeConsts.YEAR).minusYears(1);
-        LocalDate end = DateUtil.getEndTime(date, DateTypeConsts.YEAR);
+        LocalDate start = DateUtils.getStartTime(date, DateTypeConsts.YEAR).minusYears(1);
+        LocalDate end = DateUtils.getEndTime(date, DateTypeConsts.YEAR);
         return Result.success(dailyStatisticService.monthTrend(deviceType, start, end));
     }
 
@@ -82,11 +82,9 @@ public class EnergyAnalysisController {
     @GetMapping("/ranking")
     public Result<List<DistributionVO>> getWaterAnalysisRanking(@Parameter(description = "设备类型：water:水表,electric:电表,gas:气表,heat:热表", required = true)
                                                                 @RequestParam("deviceType") String deviceType,
-                                                                @Parameter(description = "时间维度：month-月度，quarter-季度，year-年度", required = true)
-                                                                @RequestParam("timeDimension") String timeDimension,
                                                                 @Parameter(description = "Top N", required = false)
                                                                 @RequestParam(value = "top", defaultValue = "10") Integer top) {
-        return Result.success(dailyStatisticService.distribution(deviceType, null, null, top));
+        return Result.success(dailyStatisticService.distribution(deviceType, null, null, top, null));
     }
 
 }

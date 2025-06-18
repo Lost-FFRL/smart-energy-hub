@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Schema(description = "小时与数值VO")
 public class HourValueVO {
+
     @Schema(description = "小时(0-23)")
     private Integer hour;
 

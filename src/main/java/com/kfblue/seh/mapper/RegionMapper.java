@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * 区域Mapper接口
- * 
+ *
  * @author system
  * @since 2025-06-17
  */
@@ -19,7 +19,7 @@ public interface RegionMapper extends BaseMapper<Region> {
 
     /**
      * 根据父级ID查询子区域列表
-     * 
+     *
      * @param parentId 父级区域ID
      * @return 子区域列表
      */
@@ -28,7 +28,7 @@ public interface RegionMapper extends BaseMapper<Region> {
 
     /**
      * 根据区域编码查询区域
-     * 
+     *
      * @param regionCode 区域编码
      * @return 区域信息
      */
@@ -37,7 +37,7 @@ public interface RegionMapper extends BaseMapper<Region> {
 
     /**
      * 根据区域类型查询区域列表
-     * 
+     *
      * @param regionType 区域类型
      * @return 区域列表
      */
@@ -46,9 +46,9 @@ public interface RegionMapper extends BaseMapper<Region> {
 
     /**
      * 查询区域树结构
-     * 
+     *
      * @return 区域树列表
      */
-    @Select("SELECT * FROM regions WHERE deleted = 0 ORDER BY region_level, region_code")
-    List<Region> selectRegionTree();
+    @Select("SELECT * FROM regions WHERE deleted = 0 and  region_level = #{level} ORDER BY id ")
+    List<Region> selectByLevel(@Param("level") Integer level);
 }

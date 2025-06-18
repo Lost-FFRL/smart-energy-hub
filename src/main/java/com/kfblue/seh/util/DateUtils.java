@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.TemporalAdjusters;
 
-public class DateUtil {
+public class DateUtils {
     /**
      * 获取给定日期在指定时间维度下的开始时间
      *

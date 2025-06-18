@@ -7,11 +7,13 @@ import com.kfblue.seh.vo.RankVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,9 +21,9 @@ import java.util.stream.Collectors;
 public class DeviceReadingService {
     private final DeviceReadingMapper deviceReadingMapper;
 
-    public List<HourValueVO> selectHourValues(LocalDate date, String deviceType) {
+    public List<HourValueVO> selectHourValues(LocalDate date, String deviceType, Set<Long> recordIds) {
         // 1. 从数据库获取有数据的小时
-        List<HourValueVO> dbResults = deviceReadingMapper.selectHourValues(deviceType, date);
+        List<HourValueVO> dbResults = deviceReadingMapper.selectHourValues(deviceType, date, recordIds);
 
         // 2. 转换为Map，以小时为key，方便查找
         Map<Integer, Double> hourDataMap = dbResults.stream().collect(Collectors.toMap(HourValueVO::getHour, HourValueVO::getValue));
@@ -38,15 +40,15 @@ public class DeviceReadingService {
         return completeResults;
     }
 
-    public Double getHourValue(LocalDateTime date, String deviceType) {
+    public BigDecimal getHourValue(LocalDateTime date, String deviceType) {
         return deviceReadingMapper.getHourValue(deviceType, date);
     }
 
-    public Double getDayValue(LocalDate date, String deviceType, Long regionId) {
-        return deviceReadingMapper.getDateValue(deviceType, date, regionId);
+    public BigDecimal getDayValue(LocalDate date, String deviceType, Set<Long> regionIds) {
+        return deviceReadingMapper.getDateValue(deviceType, date, regionIds);
     }
 
-    public List<DayValueVO> dayStats(LocalDate startDate, LocalDate endDate, String deviceType, Long regionId) {
+    public List<DayValueVO> dayStats(LocalDate startDate, LocalDate endDate, String deviceType, Set<Long> regionId) {
         return deviceReadingMapper.dayStats(startDate, endDate, deviceType, regionId);
     }
 

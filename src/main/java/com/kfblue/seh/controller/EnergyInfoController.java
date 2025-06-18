@@ -3,6 +3,7 @@ package com.kfblue.seh.controller;
 import com.kfblue.seh.common.Result;
 import com.kfblue.seh.service.DeviceReadingService;
 import com.kfblue.seh.service.DeviceService;
+import com.kfblue.seh.service.RegionService;
 import com.kfblue.seh.util.RateUtils;
 import com.kfblue.seh.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 能耗信息控制器
@@ -30,6 +33,7 @@ import java.util.Map;
 public class EnergyInfoController {
     private final DeviceService deviceService;
     private final DeviceReadingService deviceReadingService;
+    private final RegionService regionService;
 
     @Operation(summary = "获取基础信息（左 1）", description = "获取能耗基础统计信息（按设备类型分类统计）")
     @GetMapping("/basic")
@@ -74,16 +78,16 @@ public class EnergyInfoController {
 
     @Operation(summary = "实时用量（中间 1）", description = "根据设备类型获取实时用量，包含今日和昨日24小时数据对比")
     @GetMapping("/hourly")
-    public Result<HourlyRainfallTrendVO> getHourlyRainfallComparison(
+    public Result<HourlyTrendVO> getHourlyRainfallComparison(
             @Parameter(description = "设备类型：water:水表,electric:电表,gas:气表,heat:热表", required = true)
             @RequestParam("deviceType") String deviceType) {
-        HourlyRainfallTrendVO vo = new HourlyRainfallTrendVO();
+        HourlyTrendVO vo = new HourlyTrendVO();
         LocalDateTime now = LocalDateTime.now();
-        vo.setTodays(deviceReadingService.selectHourValues(now.toLocalDate(), deviceType));
-        vo.setYesterdays(deviceReadingService.selectHourValues(now.toLocalDate().minusDays(1), deviceType));
+        vo.setTodays(deviceReadingService.selectHourValues(now.toLocalDate(), deviceType, null));
+        vo.setYesterdays(deviceReadingService.selectHourValues(now.toLocalDate().minusDays(1), deviceType, null));
         vo.setCurrentHour(deviceReadingService.getHourValue(now, deviceType));
-        double previous = deviceReadingService.getHourValue(now.minusHours(1), deviceType);
-        double yesterday = deviceReadingService.getHourValue(now.minusDays(1), deviceType);
+        BigDecimal previous = deviceReadingService.getHourValue(now.minusHours(1), deviceType);
+        BigDecimal yesterday = deviceReadingService.getHourValue(now.minusDays(1), deviceType);
         vo.setMomRate(RateUtils.calculateGrowthRate(vo.getCurrentHour(), previous));
         vo.setYoyRate(RateUtils.calculateGrowthRate(vo.getCurrentHour(), yesterday));
         return Result.success(vo);
@@ -97,10 +101,11 @@ public class EnergyInfoController {
                                      @RequestParam(value = "regionId", required = false) Long regionId) {
         DayTrendVO vo = new DayTrendVO();
         LocalDateTime now = LocalDateTime.now();
-        vo.setCurrent(deviceReadingService.getDayValue(now.toLocalDate(), deviceType, regionId));
-        vo.setTrends(deviceReadingService.dayStats(now.toLocalDate().minusDays(7), now.toLocalDate(), deviceType, regionId));
-        double previous = deviceReadingService.getDayValue(now.toLocalDate().minusDays(1), deviceType, regionId);
-        double year = deviceReadingService.getDayValue(now.toLocalDate().minusYears(1), deviceType, regionId);
+        Set<Long> regionIds = regionService.selectChildrenIds(regionId);
+        vo.setCurrent(deviceReadingService.getDayValue(now.toLocalDate(), deviceType, regionIds));
+        vo.setTrends(deviceReadingService.dayStats(now.toLocalDate().minusDays(7), now.toLocalDate(), deviceType, regionIds));
+        BigDecimal previous = deviceReadingService.getDayValue(now.toLocalDate().minusDays(1), deviceType, regionIds);
+        BigDecimal year = deviceReadingService.getDayValue(now.toLocalDate().minusYears(1), deviceType, regionIds);
         vo.setMomRate(RateUtils.calculateGrowthRate(vo.getCurrent(), previous));
         vo.setYoyRate(RateUtils.calculateGrowthRate(vo.getCurrent(), year));
         return Result.success(vo);
@@ -121,11 +126,11 @@ public class EnergyInfoController {
     @Operation(summary = "日排行榜（右 2、3）")
     @GetMapping("/day/rank")
     public Result<List<RankVO>> dayRank(@Parameter(description = "设备类型：water:水表,electric:电表,gas:气表,heat:热表", required = true)
-                                      @RequestParam("deviceType") String deviceType,
-                                      @Parameter(description = "区域ID")
-                                      @RequestParam(value = "regionId", required = false) Long regionId,
-                                      @Parameter(description = "取多少名额，默认 10")
-                                      @RequestParam(value = "top", required = false, defaultValue = "10") Integer top) {
+                                        @RequestParam("deviceType") String deviceType,
+                                        @Parameter(description = "区域ID")
+                                        @RequestParam(value = "regionId", required = false) Long regionId,
+                                        @Parameter(description = "取多少名额，默认 10")
+                                        @RequestParam(value = "top", required = false, defaultValue = "10") Integer top) {
 
         return Result.success(deviceReadingService.selectDayRank(deviceType, LocalDate.now(), top));
     }

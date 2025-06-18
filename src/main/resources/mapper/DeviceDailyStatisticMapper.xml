@@ -7,23 +7,44 @@
     <select id="summary" resultType="java.math.BigDecimal">
         SELECT SUM(dds.daily_consumption)
         FROM device_daily_statistics dds
-                 left join devices d on d.id = dds.device_id
-        WHERE d.device_type = #{deviceType}
-          AND dds.stat_date BETWEEN #{startDate} AND #{endDate}
+        left join devices d on d.id = dds.device_id
+        <where>
+            <if test="deviceType != null">
+                and d.device_type = #{deviceType}
+            </if>
+            <if test="startDate != null">
+                and dds.stat_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and dds.stat_date &lt;= #{endDate}
+            </if>
+            <if test="regionIds != null and regionIds.size() > 0">
+                and d.region_id in
+                <foreach collection="regionIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
     </select>
     <select id="distribution" resultType="com.kfblue.seh.vo.DistributionVO">
         SELECT r.id,
         r.region_name as name,
         COALESCE(SUM(dds.daily_consumption), 0.0) as value
         FROM regions r
-        LEFT JOIN devices d ON r.id = d.region_id AND d.device_type = #{deviceType}
+        LEFT JOIN devices d ON r.id = d.region_id
         LEFT JOIN device_daily_statistics dds ON d.id = dds.device_id
         <where>
             <if test="deviceType != null and deviceType != ''">
-                d.device_type = #{deviceType}
+                and d.device_type = #{deviceType}
             </if>
             <if test="startDate != null and endDate != null">
                 AND dds.stat_date BETWEEN #{startDate} AND #{endDate}
+            </if>
+            <if test="regionIds != null and regionIds.size() > 0">
+                and d.region_id in
+                <foreach collection="regionIds" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
         </where>
         GROUP BY r.id, r.region_name
@@ -45,7 +66,26 @@
             AND d.device_type = #{deviceType}
         </if>
         GROUP BY YEAR(dds.stat_date), MONTH(stat_date)
-        ORDER BY YEAR(dds.stat_date), MONTH(stat_date);
+        ORDER BY YEAR(dds.stat_date), MONTH(stat_date)
+    </select>
+    <select id="dayTrend" resultType="com.kfblue.seh.vo.DayValueVO">
+        SELECT dds.stat_date AS day,
+        COALESCE(SUM(dds.daily_consumption), 0.0) as value
+        FROM device_daily_statistics dds
+        left join devices d on d.id = dds.device_id
+        WHERE
+        dds.stat_date BETWEEN #{startDate} AND #{endDate}
+        <if test="deviceType != null and deviceType != ''">
+            AND d.device_type = #{deviceType}
+        </if>
+        <if test="regionIds != null and regionIds.size() > 0">
+            and d.region_id in
+            <foreach collection="regionIds" item="item" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY dds.stat_date
+        ORDER BY dds.stat_date
     </select>
 
 </mapper>

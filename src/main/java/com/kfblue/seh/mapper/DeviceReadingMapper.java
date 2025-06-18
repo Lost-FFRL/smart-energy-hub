@@ -6,24 +6,27 @@ import com.kfblue.seh.vo.RankVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface DeviceReadingMapper {
 
-    List<HourValueVO> selectHourValues(@Param("deviceType") String deviceType, @Param("statsDate") LocalDate statsDate);
+    List<HourValueVO> selectHourValues(@Param("deviceType") String deviceType,
+                                       @Param("statsDate") LocalDate statsDate,
+                                       @Param("regionIds") Set<Long> regionIds);
 
-    Double getHourValue(@Param("deviceType") String deviceType, @Param("time") LocalDateTime time);
+    BigDecimal getHourValue(@Param("deviceType") String deviceType, @Param("time") LocalDateTime time);
 
-    Double getDateValue(@Param("deviceType") String deviceType, @Param("statsDate") LocalDate statsDate
-            , @Param("regionId") Long regionId);
+    BigDecimal getDateValue(@Param("deviceType") String deviceType, @Param("statsDate") LocalDate statsDate, @Param("regionIds") Set<Long> regionIds);
 
     List<DayValueVO> dayStats(@Param("startDate") LocalDate startDate,
                               @Param("endDate") LocalDate endDate,
                               @Param("deviceType") String deviceType,
-                              @Param("regionId") Long regionId);
+                              @Param("regionIds") Set<Long> regionIds);
 
     /**
      * 获取设备日排行榜

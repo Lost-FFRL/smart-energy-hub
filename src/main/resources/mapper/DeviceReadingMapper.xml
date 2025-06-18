@@ -3,23 +3,29 @@
 <mapper namespace="com.kfblue.seh.mapper.DeviceReadingMapper">
 
     <select id="selectHourValues" resultType="com.kfblue.seh.vo.HourValueVO">
-        SELECT HOUR(dr.reading_time)                as hour,
-               COALESCE(SUM(dr.increment_value), 0) as value
+        SELECT HOUR(dr.reading_time) as hour,
+        COALESCE(SUM(dr.increment_value), 0) as value
         FROM device_readings dr
-                 left JOIN devices d ON dr.device_id = d.id
+        left JOIN devices d ON dr.device_id = d.id
         WHERE d.device_type = #{deviceType}
-          AND DATE(dr.reading_time) = #{statsDate}
+        AND DATE(dr.reading_time) = #{statsDate}
+        <if test="regionIds != null and regionIds.size() > 0">
+            AND d.region_id IN
+            <foreach item="regionId" collection="regionIds" separator="," close=")" open="(" index="">
+                #{regionId}
+            </foreach>
+        </if>
         GROUP BY HOUR(dr.reading_time)
         ORDER BY hour
     </select>
-    <select id="getHourValue" resultType="java.lang.Double">
+    <select id="getHourValue" resultType="java.math.BigDecimal">
         SELECT COALESCE(SUM(dr.increment_value), 0.0) as value
         FROM device_readings dr
                  LEFT JOIN devices d ON dr.device_id = d.id
         WHERE d.device_type = #{deviceType}
           AND DATE_FORMAT(dr.reading_time, '%Y-%m-%d %H') = DATE_FORMAT(#{time}, '%Y-%m-%d %H')
     </select>
-    <select id="getDateValue" resultType="java.lang.Double">
+    <select id="getDateValue" resultType="java.math.BigDecimal">
         SELECT COALESCE(SUM(dr.increment_value), 0.0) as value
         FROM device_readings dr
         LEFT JOIN devices d ON dr.device_id = d.id
@@ -30,8 +36,11 @@
             <if test="statsDate != null">
                 AND DATE(dr.reading_time) = #{statsDate}
             </if>
-            <if test="regionId != null">
-                AND d.region_id = #{regionId}
+            <if test="regionIds != null and regionIds.size() > 0">
+                AND d.region_id IN
+                <foreach item="regionId" collection="regionIds" separator="," close=")" open="(" index="">
+                    #{regionId}
+                </foreach>
             </if>
         </where>
     </select>
@@ -43,8 +52,11 @@
         WHERE d.device_type = #{deviceType}
         AND DATE(dr.reading_time) &gt;= #{startDate}
         AND DATE(dr.reading_time) &lt;= #{endDate}
-        <if test="regionId != null">
-            AND d.region_id = #{regionId}
+        <if test="regionIds != null and regionIds.size() > 0">
+            AND d.region_id IN
+            <foreach item="regionId" collection="regionIds" separator="," close=")" open="(" index="">
+                #{regionId}
+            </foreach>
         </if>
         GROUP BY DATE(dr.reading_time)
         ORDER BY DATE(dr.reading_time)
