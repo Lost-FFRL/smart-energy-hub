@@ -10,7 +10,6 @@ import lombok.Data;
  * @since 2025-06-17
  */
 @Data
-@TableName("regions")
 public class RegionVO {
 
     private Long id;

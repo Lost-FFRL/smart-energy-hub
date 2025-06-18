@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "同比分析")
 public class YoyVO {
 
     @Schema(description = "当日总量")

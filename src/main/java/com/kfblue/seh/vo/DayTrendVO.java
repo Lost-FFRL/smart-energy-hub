@@ -9,7 +9,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "日量")
 public class DayTrendVO {
 
     @Schema(description = "7天用量列表")

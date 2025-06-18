@@ -8,7 +8,6 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "小时用量对比")
 public class HourCompareVO {
 
     @Schema(description = "昨日24小时用量列表")

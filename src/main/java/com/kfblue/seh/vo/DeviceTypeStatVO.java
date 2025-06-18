@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "能耗设备类型统计VO")
 public class DeviceTypeStatVO {
     @Schema(description = "设备类型(water:水表,electric:电表,gas:气表,heat:热表)")
     private String deviceType;

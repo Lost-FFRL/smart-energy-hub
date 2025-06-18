@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "用量分布")
 public class DistributionVO {
 
     @Schema(description = "区域")

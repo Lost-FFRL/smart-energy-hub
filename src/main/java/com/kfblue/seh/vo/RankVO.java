@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "用量排行榜")
 public class RankVO {
 
     @Schema(description = "区域")

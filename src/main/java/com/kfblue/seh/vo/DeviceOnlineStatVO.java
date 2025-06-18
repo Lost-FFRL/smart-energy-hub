@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "能耗设备类型统计VO")
 public class DeviceOnlineStatVO {
     @Schema(description = "在线设备量")
     private Integer onlineCnt;

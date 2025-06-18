@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "月份与数值VO")
 public class MonthValueVO {
 
     @Schema(description = "年份 1-12")

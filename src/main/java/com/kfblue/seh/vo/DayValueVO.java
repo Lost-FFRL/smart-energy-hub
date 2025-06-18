@@ -8,7 +8,6 @@ import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
-@Schema(description = "日期与数值VO")
 public class DayValueVO {
     @Schema(description = "日期")
     private LocalDate date;
