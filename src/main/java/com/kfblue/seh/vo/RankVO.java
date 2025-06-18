@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class RankVO {
 
-    @Schema(description = "区域")
-    private String region;
+    @Schema(description = "区域名称")
+    private String name;
 
     private Long id;
 

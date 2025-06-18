@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -38,42 +38,16 @@ public class EnergyInfoController {
     @Operation(summary = "获取基础信息（左 1）", description = "获取能耗基础统计信息（按设备类型分类统计）")
     @GetMapping("/basic")
     public Result<List<DeviceTypeStatVO>> getBasicInfo() {
-        List<Map<String, Integer>> deviceTypeStats = deviceService.countByDeviceType();
-        List<DeviceTypeStatVO> voList = deviceTypeStats.stream()
-                .map(map -> new DeviceTypeStatVO(
-                        map.get("device_type") != null ? String.valueOf(map.get("device_type")) : null,
-                        map.get("count")
-                ))
-                .toList();
-        return Result.success(voList);
+        return Result.success(deviceService.countByDeviceType());
     }
 
     @Operation(summary = "获取设备在线情况(左 2)", description = "获取当日设备在线状态统计")
     @GetMapping("/device/online")
     public Result<DeviceOnlineStatVO> getDeviceOnlineStatus() {
-        List<Map<String, Integer>> stats = deviceService.getOnlineStats();
-        int onlineCnt = 0;
-        int offlineCnt = 0;
-        int totalCnt = 0;
-        for (Map<String, Integer> stat : stats) {
-            Integer status = stat.get("online_status");
-            Integer count = stat.get("count");
-            if (status != null && count != null) {
-                if (status == 1) {
-                    onlineCnt = count;
-                } else {
-                    offlineCnt += count;
-                }
-                totalCnt += count;
-            }
-        }
-        String onlineRate = totalCnt > 0 ? String.format("%.1f%%", onlineCnt * 100.0 / totalCnt) : "0.0%";
-        DeviceOnlineStatVO vo = new DeviceOnlineStatVO();
-        vo.setOnlineCnt(onlineCnt);
-        vo.setOfflineCnt(offlineCnt);
-        vo.setTotalCnt(totalCnt);
-        vo.setOnlineRate(onlineRate);
-        return Result.success(vo);
+        DeviceOnlineStatVO result = deviceService.getOnlineStats();
+        result.setOnlineRate(result.getTotalCnt() > 0
+                ? BigDecimal.valueOf(result.getOnlineCnt()).divide(BigDecimal.valueOf(result.getTotalCnt()), 4, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+        return Result.success(result);
     }
 
     @Operation(summary = "实时用量（中间 1）", description = "根据设备类型获取实时用量，包含今日和昨日24小时数据对比")

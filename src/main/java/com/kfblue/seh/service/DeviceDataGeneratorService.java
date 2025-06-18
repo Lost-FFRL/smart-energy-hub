@@ -25,7 +25,7 @@ public class DeviceDataGeneratorService {
     private final Random random = new Random();
     
     /**
-     * 为指定设备生成一条读数记录
+     * 生成设备读数
      * @param device 设备信息
      * @param readingTime 读数时间
      * @return 生成的设备读数
@@ -35,10 +35,18 @@ public class DeviceDataGeneratorService {
         reading.setDeviceId(device.getId());
         reading.setReadingTime(readingTime);
         
-        // 获取上次读数值
-        BigDecimal lastValue = getLastReadingValue(device.getId());
+        // 获取上次读数值，如果没有历史数据则使用设备初始值
+        BigDecimal lastValue = null;
+        try {
+            lastValue = getLastReadingValue(device.getId());
+        } catch (Exception e) {
+            log.warn("获取设备{}最后读数值失败: {}", device.getId(), e.getMessage());
+        }
+        
         if (lastValue == null) {
-            lastValue = device.getInitialValue() != null ? device.getInitialValue() : BigDecimal.ZERO;
+            // 如果没有历史数据，使用设备初始值，如果初始值也为空则使用默认值
+            lastValue = device.getInitialValue() != null ? device.getInitialValue() : getDefaultInitialValue(device.getDeviceType());
+            log.info("设备{}没有历史数据，使用初始值: {}", device.getId(), lastValue);
         }
         
         // 根据设备类型生成不同的数据
@@ -172,5 +180,23 @@ public class DeviceDataGeneratorService {
      */
     private BigDecimal getLastReadingValue(Long deviceId) {
         return deviceReadingService.getLastReadingValue(deviceId);
+    }
+    
+    /**
+     * 根据设备类型获取默认初始值
+     */
+    private BigDecimal getDefaultInitialValue(String deviceType) {
+        switch (deviceType) {
+            case DeviceTypeConstants.WATER:
+                return new BigDecimal("1000.0"); // 水表默认1000立方米
+            case DeviceTypeConstants.ELECTRIC:
+                return new BigDecimal("5000.0"); // 电表默认5000度
+            case DeviceTypeConstants.GAS:
+                return new BigDecimal("800.0"); // 燃气表默认800立方米
+            case DeviceTypeConstants.HEAT:
+                return new BigDecimal("2000.0"); // 热量表默认2000千瓦时
+            default:
+                return BigDecimal.ZERO;
+        }
     }
 }

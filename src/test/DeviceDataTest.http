@@ -2,3 +2,4 @@
 POST {{host}}/test/device-data/generate
 
 ###
+GET {{host}}/energy/info/basic

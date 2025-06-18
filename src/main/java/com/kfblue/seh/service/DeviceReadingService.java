@@ -96,4 +96,18 @@ public class DeviceReadingService extends ServiceImpl<DeviceReadingMapper, Devic
     public List<DeviceReading> getReadingsByTimeRange(Long deviceId, LocalDateTime startTime, LocalDateTime endTime) {
         return deviceReadingMapper.getReadingsByTimeRange(deviceId, startTime, endTime);
     }
+    
+    /**
+     * 统计指定设备的读数数量
+     */
+    public int countByDeviceId(Long deviceId) {
+        return deviceReadingMapper.countByDeviceId(deviceId);
+    }
+    
+    /**
+     * 获取设备最新的N条读数记录
+     */
+    public List<DeviceReading> getLatestReadingsByDeviceId(Long deviceId, int limit) {
+        return deviceReadingMapper.getLatestReadingsByDeviceId(deviceId, limit);
+    }
 }

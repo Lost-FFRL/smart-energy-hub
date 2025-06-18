@@ -1,0 +1,14 @@
+###
+GET {{host}}/energy/info/basic
+
+###
+GET {{host}}/energy/info/device/online
+
+###
+GET {{host}}/energy/info/hourly?deviceType=gas
+
+###
+GET {{host}}/energy/info/day?deviceType=water
+
+###
+GET {{host}}/energy/info/hour/rank?deviceType=water

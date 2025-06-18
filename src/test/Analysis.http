@@ -1,0 +1,18 @@
+###
+GET {{host}}/energy/analysis/summary?deviceType=gas&timeDimension=month
+
+###
+GET {{host}}/energy/analysis/summary?deviceType=gas&timeDimension=quarter
+
+###
+GET {{host}}/energy/analysis/summary?deviceType=gas&timeDimension=year
+
+###
+GET {{host}}/energy/analysis/distribution?deviceType=gas&timeDimension=month
+
+###
+GET {{host}}/energy/analysis/trend?deviceType=gas&timeDimension=month
+
+###
+GET {{host}}/energy/analysis/ranking?deviceType=gas&timeDimension=month
+

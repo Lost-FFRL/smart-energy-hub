@@ -2,6 +2,8 @@ package com.kfblue.seh.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.kfblue.seh.entity.Device;
+import com.kfblue.seh.vo.DeviceOnlineStatVO;
+import com.kfblue.seh.vo.DeviceTypeStatVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
@@ -73,13 +75,15 @@ public interface DeviceMapper extends BaseMapper<Device> {
      * 
      * @return 在线统计信息
      */
-    @Select("SELECT online_status, COUNT(*) as count FROM devices WHERE deleted = 0 GROUP BY online_status")
-    List<java.util.Map<String, Integer>> selectOnlineStats();
+    @Select("SELECT         COALESCE(SUM(CASE WHEN online_status = 1 THEN 1 ELSE 0 END), 0) as onlineCnt," +
+            "        COALESCE(SUM(CASE WHEN online_status = 0 THEN 1 ELSE 0 END), 0) as offlineCnt," +
+            "        COUNT(*) as totalCnt FROM devices WHERE deleted = 0 GROUP BY online_status")
+    DeviceOnlineStatVO selectOnlineStats();
 
     /**
      * 按设备类型分组统计设备数量
      * @return 设备类型及数量列表
      */
-    @Select("SELECT device_type, COUNT(*) as count FROM devices WHERE deleted = 0 GROUP BY device_type")
-    List<java.util.Map<String, Integer>> countByDeviceType();
+    @Select("SELECT device_type as deviceType, COUNT(*) as count FROM devices WHERE deleted = 0 GROUP BY device_type")
+    List<DeviceTypeStatVO> countByDeviceType();
 }

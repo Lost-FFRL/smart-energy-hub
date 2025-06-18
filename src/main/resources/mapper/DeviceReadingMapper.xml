@@ -85,4 +85,35 @@
           AND DATE_FORMAT(dr.reading_time, '%Y-%m-%d %H') = DATE_FORMAT(#{time}, '%Y-%m-%d %H')
         GROUP BY r.id, r.region_name
     </select>
+    
+    <select id="getLastReadingValue" resultType="java.math.BigDecimal">
+        SELECT current_value
+        FROM device_readings
+        WHERE device_id = #{deviceId}
+        ORDER BY reading_time DESC
+        LIMIT 1
+    </select>
+    
+    <select id="getReadingsByTimeRange" resultType="com.kfblue.seh.entity.DeviceReading">
+        SELECT *
+        FROM device_readings
+        WHERE device_id = #{deviceId}
+        AND reading_time &gt;= #{startTime}
+        AND reading_time &lt;= #{endTime}
+        ORDER BY reading_time ASC
+    </select>
+    
+    <select id="countByDeviceId" resultType="int">
+        SELECT COUNT(*)
+        FROM device_readings
+        WHERE device_id = #{deviceId}
+    </select>
+    
+    <select id="getLatestReadingsByDeviceId" resultType="com.kfblue.seh.entity.DeviceReading">
+        SELECT *
+        FROM device_readings
+        WHERE device_id = #{deviceId}
+        ORDER BY reading_time DESC
+        LIMIT #{limit}
+    </select>
 </mapper>

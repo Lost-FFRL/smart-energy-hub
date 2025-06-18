@@ -57,4 +57,17 @@ public interface DeviceReadingMapper extends BaseMapper<DeviceReading> {
         @Param("startTime") LocalDateTime startTime,
         @Param("endTime") LocalDateTime endTime
     );
+    
+    /**
+     * 统计指定设备的读数数量
+     */
+    int countByDeviceId(@Param("deviceId") Long deviceId);
+    
+    /**
+     * 获取设备最新的N条读数记录
+     */
+    List<DeviceReading> getLatestReadingsByDeviceId(
+        @Param("deviceId") Long deviceId,
+        @Param("limit") int limit
+    );
 }

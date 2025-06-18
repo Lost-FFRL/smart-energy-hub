@@ -50,7 +50,7 @@
         GROUP BY r.id, r.region_name
         ORDER BY value DESC
         <if test="top != null">
-            `LIMIT` #{top}
+            LIMIT #{top}
         </if>
     </select>
 

@@ -156,5 +156,25 @@ public class DeviceDailyStatisticService extends ServiceImpl<DeviceDailyStatisti
         
         return statistics;
     }
+    
+    /**
+     * 统计指定设备和日期的统计记录数量
+     */
+    public int countByDeviceIdAndDate(Long deviceId, LocalDate date) {
+        return this.lambdaQuery()
+            .eq(DeviceDailyStatistics::getDeviceId, deviceId)
+            .eq(DeviceDailyStatistics::getStatDate, date)
+            .count().intValue();
+    }
+    
+    /**
+     * 获取指定设备和日期的统计记录
+     */
+    public List<DeviceDailyStatistics> getByDeviceIdAndDate(Long deviceId, LocalDate date) {
+        return this.lambdaQuery()
+            .eq(DeviceDailyStatistics::getDeviceId, deviceId)
+            .eq(DeviceDailyStatistics::getStatDate, date)
+            .list();
+    }
 
 }

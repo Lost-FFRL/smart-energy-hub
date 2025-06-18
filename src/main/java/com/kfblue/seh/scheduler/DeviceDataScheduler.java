@@ -75,10 +75,13 @@ public class DeviceDataScheduler {
             try {
                 // 为每个设备生成数据
                 DeviceReading reading = deviceDataGeneratorService.generateDeviceReading(device, now);
-                deviceReadingService.saveReading(reading);
-                
-                log.debug("为设备 {} 生成数据: 当前值={}, 增量值={}", 
-                    device.getDeviceCode(), reading.getCurrentValue(), reading.getIncrementValue());
+                if (reading != null) {
+                    deviceReadingService.saveReading(reading);
+                    log.debug("为设备 {} 生成数据: 当前值={}, 增量值={}", 
+                        device.getDeviceCode(), reading.getCurrentValue(), reading.getIncrementValue());
+                } else {
+                    log.warn("设备 {} 数据生成失败，返回null", device.getDeviceCode());
+                }
             } catch (Exception e) {
                 log.error("为设备 {} 生成数据失败", device.getDeviceCode(), e);
             }

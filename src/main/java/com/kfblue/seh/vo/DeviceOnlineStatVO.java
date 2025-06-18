@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 public class DeviceOnlineStatVO {
@@ -17,5 +19,5 @@ public class DeviceOnlineStatVO {
     private Integer totalCnt;
 
     @Schema(description = "在线率，百分比字符串如99.9%")
-    private String onlineRate;
+    private BigDecimal onlineRate;
 }

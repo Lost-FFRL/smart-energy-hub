@@ -1,15 +1,15 @@
 package com.kfblue.seh.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kfblue.seh.entity.Device;
 import com.kfblue.seh.mapper.DeviceMapper;
+import com.kfblue.seh.vo.DeviceOnlineStatVO;
+import com.kfblue.seh.vo.DeviceTypeStatVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -39,14 +39,14 @@ public class DeviceService extends ServiceImpl<DeviceMapper, Device> {
     /**
      * 按设备类型统计设备数量
      */
-    public List<Map<String, Integer>> countByDeviceType() {
+    public List<DeviceTypeStatVO> countByDeviceType() {
         return baseMapper.countByDeviceType();
     }
     
     /**
      * 获取设备在线状态统计
      */
-    public List<Map<String, Integer>> getOnlineStats() {
+    public DeviceOnlineStatVO getOnlineStats() {
         return baseMapper.selectOnlineStats();
     }
     
