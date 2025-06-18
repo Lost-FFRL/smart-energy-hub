@@ -1,0 +1,4 @@
+### GET request to example server
+POST {{host}}/test/device-data/generate
+
+###

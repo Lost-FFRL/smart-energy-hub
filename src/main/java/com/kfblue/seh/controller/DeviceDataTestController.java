@@ -15,7 +15,7 @@ import java.time.LocalDate;
  */
 @Tag(name = "设备数据测试", description = "设备数据生成和统计测试接口")
 @RestController
-@RequestMapping("/api/test/device-data")
+@RequestMapping("/test/device-data")
 @RequiredArgsConstructor
 public class DeviceDataTestController {
     
