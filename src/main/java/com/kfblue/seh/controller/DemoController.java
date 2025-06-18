@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kfblue.seh.common.Result;
 import com.kfblue.seh.entity.Demo;
 import com.kfblue.seh.service.DemoService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,18 +13,20 @@ import org.springframework.web.bind.annotation.*;
  * Demo控制器
  */
 @RestController
+@Tag(name = "示例代码")
 @RequestMapping("/api/demo")
 @RequiredArgsConstructor
 public class DemoController {
-    
+
     private final DemoService demoService;
-    
+
     /**
      * 分页查询Demo列表
+     *
      * @param current 当前页
-     * @param size 每页大小
-     * @param name 名称(可选)
-     * @param status 状态(可选)
+     * @param size    每页大小
+     * @param name    名称(可选)
+     * @param status  状态(可选)
      * @return 分页结果
      */
     @GetMapping("/page")
@@ -36,9 +39,10 @@ public class DemoController {
         IPage<Demo> result = demoService.page(page, name, status);
         return Result.success(result);
     }
-    
+
     /**
      * 根据ID获取Demo详情
+     *
      * @param id ID
      * @return Demo对象
      */
@@ -50,9 +54,10 @@ public class DemoController {
         }
         return Result.success(demo);
     }
-    
+
     /**
      * 新增Demo
+     *
      * @param demo Demo对象
      * @return 操作结果
      */
@@ -61,9 +66,10 @@ public class DemoController {
         boolean success = demoService.save(demo);
         return success ? Result.success("新增成功", null) : Result.error("新增失败");
     }
-    
+
     /**
      * 更新Demo
+     *
      * @param demo Demo对象
      * @return 操作结果
      */
@@ -72,9 +78,10 @@ public class DemoController {
         boolean success = demoService.update(demo);
         return success ? Result.success("更新成功", null) : Result.error("更新失败");
     }
-    
+
     /**
      * 删除Demo
+     *
      * @param id ID
      * @return 操作结果
      */

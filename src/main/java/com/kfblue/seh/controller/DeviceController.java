@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kfblue.seh.common.Result;
 import com.kfblue.seh.entity.Device;
 import com.kfblue.seh.service.DeviceService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,7 +19,8 @@ import java.util.List;
  * @since 2025-06-17
  */
 @RestController
-@RequestMapping("/api/devices")
+@Tag(name = "设备管理")
+@RequestMapping("/devices")
 @RequiredArgsConstructor
 public class DeviceController {
 
