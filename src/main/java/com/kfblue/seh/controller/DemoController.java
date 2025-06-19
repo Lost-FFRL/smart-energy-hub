@@ -3,6 +3,7 @@ package com.kfblue.seh.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kfblue.seh.common.Result;
+import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.entity.Demo;
 import com.kfblue.seh.service.DemoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @Tag(name = "示例代码")
-@RequestMapping("/api/demo")
+@RequestMapping(ApiPaths.DEMO)
 @RequiredArgsConstructor
 public class DemoController {
 

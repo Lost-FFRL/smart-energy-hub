@@ -92,6 +92,28 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     }
     
     @Override
+    public SysUser getCurrentUser() {
+        try {
+            // 检查是否已登录
+            StpUtil.checkLogin();
+            
+            // 获取当前登录用户ID
+            Long userId = StpUtil.getLoginIdAsLong();
+            
+            // 查询用户信息
+            SysUser user = getById(userId);
+            if (user == null) {
+                throw new RuntimeException("用户不存在");
+            }
+            
+            return user;
+        } catch (Exception e) {
+            log.error("获取当前用户信息失败", e);
+            throw new RuntimeException("获取用户信息失败: " + e.getMessage());
+        }
+    }
+    
+    @Override
     public SysUser getByUsername(String username) {
         return sysUserMapper.selectByUsername(username);
     }

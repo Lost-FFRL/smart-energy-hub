@@ -1,6 +1,8 @@
 package com.kfblue.seh.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.kfblue.seh.common.Result;
+import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.service.DeviceReadingService;
 import com.kfblue.seh.service.DeviceService;
 import com.kfblue.seh.service.RegionService;
@@ -9,11 +11,10 @@ import com.kfblue.seh.vo.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,7 +29,7 @@ import java.util.Set;
  */
 @Tag(name = "能耗信息", description = "能耗信息管理相关接口")
 @RestController
-@RequestMapping("/energy/info")
+@RequestMapping(ApiPaths.API_V0 + "/energy/info")
 @RequiredArgsConstructor
 public class EnergyInfoController {
     private final DeviceService deviceService;

@@ -299,17 +299,36 @@
         // 初始化页面
         function initializePage() {
             // 检查登录状态
-            const userInfo = localStorage.getItem('userInfo');
-            if (!userInfo) {
-                window.location.href = '/login';
-                return;
-            }
+            checkAuth();
+        }
 
-            // 显示用户信息
-            const user = JSON.parse(userInfo);
-            document.getElementById('userName').textContent = user.realName || user.username;
-            document.getElementById('welcomeUserName').textContent = user.realName || user.username;
-            document.getElementById('userInitial').textContent = (user.realName || user.username).charAt(0).toUpperCase();
+        // 检查登录状态
+        function checkAuth() {
+            fetch('/api/auth/check', {
+                method: 'GET',
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    window.location.href = '/login';
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.code === 200) {
+                    const user = data.data;
+                    document.getElementById('userName').textContent = user.realName || user.username;
+                    document.getElementById('welcomeUserName').textContent = user.realName || user.username;
+                    document.getElementById('userInitial').textContent = (user.realName || user.username).charAt(0).toUpperCase();
+                } else {
+                    window.location.href = '/login';
+                }
+            })
+            .catch(error => {
+                console.error('认证检查失败:', error);
+                window.location.href = '/login';
+            });
 
             // 显示当前日期
             const now = new Date();

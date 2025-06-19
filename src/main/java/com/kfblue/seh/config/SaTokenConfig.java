@@ -3,6 +3,7 @@ package com.kfblue.seh.config;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
+import com.kfblue.seh.constants.ApiPaths;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -25,8 +26,8 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 .match("/**")    // 拦截的 path 列表，可以写多个 */
                 .notMatch("/")   // 排除掉的 path 列表，可以写多个
                 .notMatch("/login")   // 排除登录页面
-                .notMatch("/api/auth/login")   // 排除登录接口
-                .notMatch("/api/auth/logout")  // 排除登出接口
+                .notMatch(ApiPaths.API_V0 + "/auth/login")   // 排除登录接口
+                .notMatch(ApiPaths.API_V0 + "/auth/logout")  // 排除登出接口
                 .notMatch("/static/**")       // 排除静态资源
                 .notMatch("/css/**")
                 .notMatch("/js/**")
@@ -34,13 +35,9 @@ public class SaTokenConfig implements WebMvcConfigurer {
                 .notMatch("/favicon.ico")
                 .notMatch("/error")
                 // 排除能耗相关查询接口（无需登录）
-                .notMatch("/api/energy/**")
-                .notMatch("/api/device/data/**")
-                .notMatch("/api/analysis/**")
-                .notMatch("/api/query/**")
-                .notMatch("/api/info/**")
+                .notMatch(ApiPaths.API_V0 + "/energy/**")
                 // 排除测试接口
-                .notMatch("/test/**")
+                .notMatch(ApiPaths.API_V0 + "/test/**")
                 // 排除Swagger相关
                 .notMatch("/swagger-ui/**")
                 .notMatch("/v3/api-docs/**")

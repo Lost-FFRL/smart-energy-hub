@@ -3,6 +3,7 @@ package com.kfblue.seh.controller;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import com.kfblue.seh.common.Result;
 import com.kfblue.seh.constant.DateTypeConsts;
+import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.service.DeviceDailyStatisticService;
 import com.kfblue.seh.service.DeviceReadingService;
 import com.kfblue.seh.service.DeviceService;
@@ -27,7 +28,7 @@ import java.util.Set;
 
 @Tag(name = "能耗查询", description = "能耗查询")
 @RestController
-@RequestMapping("/energy/query")
+@RequestMapping(ApiPaths.API_V0 + "/energy/query")
 @RequiredArgsConstructor
 public class EnergyQueryController {
     private final DeviceService deviceService;

@@ -2,6 +2,7 @@ package com.kfblue.seh.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.kfblue.seh.common.Result;
+import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.dto.LoginDTO;
 import com.kfblue.seh.service.SysUserService;
 import com.kfblue.seh.vo.LoginVO;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping(ApiPaths.API_V0 + "/auth")
 @RequiredArgsConstructor
 @Tag(name = "认证管理", description = "用户登录、登出等认证相关接口")
 public class AuthController {
@@ -57,6 +58,21 @@ public class AuthController {
         } catch (Exception e) {
             log.error("登出失败: {}", e.getMessage());
             return Result.error(e.getMessage());
+        }
+    }
+    
+    /**
+     * 检查登录状态
+     */
+    @GetMapping("/check")
+    @Operation(summary = "检查登录状态", description = "验证用户是否已登录")
+    public Result<Object> checkAuth() {
+        try {
+            Object userInfo = sysUserService.getCurrentUser();
+            return Result.success(userInfo);
+        } catch (Exception e) {
+            log.error("检查登录状态失败: {}", e.getMessage());
+            return Result.error("未登录或登录已过期");
         }
     }
     

@@ -1,18 +1,23 @@
 package com.kfblue.seh.controller;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kfblue.seh.common.Result;
+import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.dto.RegionDTO;
 import com.kfblue.seh.entity.Region;
 import com.kfblue.seh.service.RegionService;
 import com.kfblue.seh.vo.RegionTreeVO;
 import com.kfblue.seh.vo.RegionVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +29,7 @@ import java.util.Map;
  * @since 2025-01-20
  */
 @RestController
-@RequestMapping("/api/regions")
+@RequestMapping(ApiPaths.REGIONS)
 @RequiredArgsConstructor
 @SaCheckLogin
 public class RegionController {

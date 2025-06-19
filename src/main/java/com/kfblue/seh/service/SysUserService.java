@@ -25,6 +25,12 @@ public interface SysUserService extends IService<SysUser> {
     boolean logout();
     
     /**
+     * 获取当前登录用户信息
+     * @return 用户信息
+     */
+    SysUser getCurrentUser();
+    
+    /**
      * 根据用户名查询用户
      * @param username 用户名
      * @return 用户信息
