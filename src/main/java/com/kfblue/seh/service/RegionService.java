@@ -285,6 +285,28 @@ public class RegionService extends ServiceImpl<RegionMapper, Region> {
     }
 
     /**
+     * 计算区域及其所有子区域的设备总数
+     *
+     * @param regionId 区域ID
+     * @return 设备总数
+     */
+    private int countAllDevicesInRegion(Long regionId) {
+        // 获取当前区域的设备数量
+        int totalCount = baseMapper.countDevicesByRegionId(regionId);
+        
+        // 获取所有子区域ID（不包含当前区域）
+        Set<Long> childrenIds = new HashSet<>();
+        collectChildrenIds(regionId, childrenIds);
+        
+        // 累加所有子区域的设备数量
+        for (Long childId : childrenIds) {
+            totalCount += baseMapper.countDevicesByRegionId(childId);
+        }
+        
+        return totalCount;
+    }
+
+    /**
      * 构建区域路径
      *
      * @param parentId 父区域ID
@@ -344,8 +366,8 @@ public class RegionService extends ServiceImpl<RegionMapper, Region> {
         treeVO.setRegionTypeLabel(REGION_TYPE_MAP.getOrDefault(region.getRegionType(), region.getRegionType()));
         treeVO.setStatusLabel(STATUS_MAP.getOrDefault(region.getStatus(), "未知"));
         
-        // 设置设备数量
-        int deviceCount = baseMapper.countDevicesByRegionId(region.getId());
+        // 设置设备数量（包含所有子区域的设备）
+        int deviceCount = countAllDevicesInRegion(region.getId());
         treeVO.setDeviceCount(deviceCount);
         
         return treeVO;
@@ -386,8 +408,8 @@ public class RegionService extends ServiceImpl<RegionMapper, Region> {
         vo.setRegionTypeLabel(REGION_TYPE_MAP.getOrDefault(region.getRegionType(), region.getRegionType()));
         vo.setStatusLabel(STATUS_MAP.getOrDefault(region.getStatus(), "未知"));
         
-        // 设置设备数量
-        int deviceCount = baseMapper.countDevicesByRegionId(region.getId());
+        // 设置设备数量（包含所有子区域的设备）
+        int deviceCount = countAllDevicesInRegion(region.getId());
         vo.setDeviceCount(deviceCount);
         
         // 检查是否有子区域

@@ -91,25 +91,7 @@
         .form-floating label {
             color: #6c757d;
         }
-        .region-stats {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .stat-item {
-            text-align: center;
-        }
-        .stat-number {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
+
         .search-box {
             position: sticky;
             top: 0;
@@ -179,12 +161,11 @@
 
         <!-- 主内容区域 -->
         <main class="main-content flex-grow-1">
-            <div class="container-fluid p-4">
+            <div id="app" class="container-fluid p-4">
                 <!-- 页面标题 -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
                         <h2 class="mb-1">区域管理</h2>
-                        <p class="text-muted mb-0">管理系统中的区域信息，支持树形结构展示和完整的CRUD操作</p>
                     </div>
                     <button class="btn btn-primary" @click="showCreateDialog">
                         <i class="bi bi-plus-lg me-2"></i>
@@ -192,35 +173,7 @@
                     </button>
                 </div>
 
-                <!-- 统计信息 -->
-                <div class="region-stats">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="stat-item">
-                                <div class="stat-number">{{ regionStats.totalRegions }}</div>
-                                <div class="stat-label">总区域数</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-item">
-                                <div class="stat-number">{{ regionStats.activeRegions }}</div>
-                                <div class="stat-label">启用区域</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-item">
-                                <div class="stat-number">{{ regionStats.totalDevices }}</div>
-                                <div class="stat-label">关联设备</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-item">
-                                <div class="stat-number">{{ regionStats.maxLevel }}</div>
-                                <div class="stat-label">最大层级</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- 主要内容区域 -->
                 <div class="row">
@@ -345,8 +298,14 @@
                                         </div>
                                     </div>
 
-                                    <!-- 其他信息 -->
-                                    <div class="row">
+                                    <!-- 备注信息 -->
+                                    <div class="mb-3" v-if="selectedRegion.remark">
+                                        <label class="form-label fw-bold">备注</label>
+                                        <p class="form-control-plaintext">{{ selectedRegion.remark }}</p>
+                                    </div>
+                                    
+                                    <!-- 其他信息（暂时隐藏） -->
+                                    <div class="row" style="display: none;">
                                         <div class="col-12">
                                             <h6 class="fw-bold mb-3">其他信息</h6>
                                             <div class="row">
@@ -371,10 +330,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="mb-3" v-if="selectedRegion.remark">
-                                                <label class="form-label fw-bold">备注</label>
-                                                <p class="form-control-plaintext">{{ selectedRegion.remark }}</p>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -382,6 +337,7 @@
                         </div>
                     </div>
                 </div>
+            </div>
             </div>
         </main>
     </div>
@@ -554,12 +510,7 @@
                     selectedRegionId: null,
                     selectedRegion: null,
                     searchKeyword: '',
-                    regionStats: {
-                        totalRegions: 0,
-                        activeRegions: 0,
-                        totalDevices: 0,
-                        maxLevel: 0
-                    },
+
                     flatRegionList: [],
                     isEdit: false,
                     regionForm: {
@@ -577,13 +528,13 @@
             },
             mounted() {
                 this.loadRegionTree();
-                this.loadRegionStats();
+
                 this.modal = new bootstrap.Modal(document.getElementById('regionModal'));
             },
             methods: {
                 async loadRegionTree() {
                     try {
-                        const response = await axios.get('/api/v0/regions/tree');
+                        const response = await axios.get('/api/regions/tree');
                         this.regionTree = response.data.data || [];
                         this.filteredRegionTree = [...this.regionTree];
                         this.buildFlatRegionList();
@@ -592,19 +543,11 @@
                         alert('加载区域树失败');
                     }
                 },
-                async loadRegionStats() {
-                    // 这里可以调用统计接口，暂时用模拟数据
-                    this.regionStats = {
-                        totalRegions: this.countAllRegions(this.regionTree),
-                        activeRegions: this.countActiveRegions(this.regionTree),
-                        totalDevices: this.countAllDevices(this.regionTree),
-                        maxLevel: this.getMaxLevel(this.regionTree)
-                    };
-                },
+
                 async selectRegion(regionId) {
                     this.selectedRegionId = regionId;
                     try {
-                        const response = await axios.get(`/api/v0/regions/${regionId}`);
+                        const response = await axios.get(`/api/regions/${regionId}`);
                         this.selectedRegion = response.data.data;
                     } catch (error) {
                         console.error('加载区域详情失败:', error);
@@ -627,6 +570,8 @@
                 },
                 showEditDialog(region) {
                     this.isEdit = true;
+                    this.selectedRegionId = region.id;
+                    this.selectedRegion = region;
                     this.regionForm = {
                         regionCode: region.regionCode,
                         regionName: region.regionName,
@@ -642,15 +587,15 @@
                 async saveRegion() {
                     try {
                         if (this.isEdit) {
-                            await axios.put(`/api/v0/regions/${this.selectedRegion.id}`, this.regionForm);
+                            await axios.put(`/api/regions/${this.selectedRegion.id}`, this.regionForm);
                             alert('更新区域成功');
                         } else {
-                            await axios.post('/api/v0/regions', this.regionForm);
+                            await axios.post('/api/regions', this.regionForm);
                             alert('创建区域成功');
                         }
                         this.modal.hide();
                         this.loadRegionTree();
-                        this.loadRegionStats();
+
                     } catch (error) {
                         console.error('保存区域失败:', error);
                         alert('保存区域失败: ' + (error.response?.data?.msg || error.message));
@@ -661,10 +606,10 @@
                         return;
                     }
                     try {
-                        await axios.delete(`/api/v0/regions/${regionId}`);
+                        await axios.delete(`/api/regions/${regionId}`);
                         alert('删除区域成功');
                         this.loadRegionTree();
-                        this.loadRegionStats();
+
                         if (this.selectedRegionId === regionId) {
                             this.selectedRegionId = null;
                             this.selectedRegion = null;
@@ -676,7 +621,7 @@
                 },
                 refreshTree() {
                     this.loadRegionTree();
-                    this.loadRegionStats();
+
                 },
                 filterTree() {
                     if (!this.searchKeyword.trim()) {
@@ -736,49 +681,13 @@
                     }
                     return null;
                 },
-                countAllRegions(regions) {
-                    let count = regions.length;
-                    regions.forEach(region => {
-                        if (region.children && region.children.length > 0) {
-                            count += this.countAllRegions(region.children);
-                        }
-                    });
-                    return count;
-                },
-                countActiveRegions(regions) {
-                    let count = regions.filter(r => r.status === 1).length;
-                    regions.forEach(region => {
-                        if (region.children && region.children.length > 0) {
-                            count += this.countActiveRegions(region.children);
-                        }
-                    });
-                    return count;
-                },
-                countAllDevices(regions) {
-                    let count = regions.reduce((sum, region) => sum + (region.deviceCount || 0), 0);
-                    regions.forEach(region => {
-                        if (region.children && region.children.length > 0) {
-                            count += this.countAllDevices(region.children);
-                        }
-                    });
-                    return count;
-                },
-                getMaxLevel(regions) {
-                    let maxLevel = 0;
-                    regions.forEach(region => {
-                        maxLevel = Math.max(maxLevel, region.regionLevel);
-                        if (region.children && region.children.length > 0) {
-                            maxLevel = Math.max(maxLevel, this.getMaxLevel(region.children));
-                        }
-                    });
-                    return maxLevel;
-                },
+
                 formatDate(dateString) {
                     if (!dateString) return '未知';
                     return new Date(dateString).toLocaleString('zh-CN');
                 }
             }
-        }).mount('body');
+        }).mount('#app');
     </script>
 </body>
 </html>

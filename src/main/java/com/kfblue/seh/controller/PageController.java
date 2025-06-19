@@ -68,7 +68,7 @@ public class PageController {
     @GetMapping("/admin/area")
     public String areaManagement(Model model) {
         StpUtil.checkLogin();
-        return "admin/area/list";
+        return "region-management";
     }
     
     /**

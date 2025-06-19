@@ -10,7 +10,10 @@
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 100px 0;
+            padding: 80px 0;
+        }
+        .min-vh-75 {
+            min-height: 75vh;
         }
         .feature-card {
             transition: transform 0.3s ease;
@@ -31,6 +34,29 @@
         .btn-custom:hover {
             background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
             color: white;
+        }
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: none;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+        }
+        .btn-login:hover {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            color: white;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .alert {
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -53,28 +79,98 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#about">关于系统</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="btn btn-custom ms-2" href="/login">管理登录</a>
-                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <!-- 主要内容区域 -->
-    <section class="hero-section text-center">
+    <section class="hero-section">
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
+            <div class="row align-items-center min-vh-75">
+                <!-- 左侧：系统介绍 -->
+                <div class="col-lg-6">
                     <h1 class="display-4 fw-bold mb-4">智慧能源管理系统</h1>
-                    <p class="lead mb-5">空港智慧空间管理平台，为您提供全面的能源数据监控、分析和管理服务</p>
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="/login" class="btn btn-light btn-lg">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>管理登录
-                        </a>
-                        <a href="#features" class="btn btn-outline-light btn-lg">
-                            <i class="bi bi-info-circle me-2"></i>了解更多
-                        </a>
+                    <p class="lead mb-4">空港智慧空间管理平台，为您提供全面的能源数据监控、分析和管理服务</p>
+                    <ul class="list-unstyled mb-4">
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>实时监控各类设备能耗数据</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>智能分析能耗趋势</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>统一设备管理</li>
+                        <li class="mb-2"><i class="bi bi-check-circle-fill text-warning me-2"></i>可视化大屏展示</li>
+                    </ul>
+                    <a href="#features" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-info-circle me-2"></i>了解更多
+                    </a>
+                </div>
+                
+                <!-- 右侧：登录表单 -->
+                <div class="col-lg-6">
+                    <div class="card login-card mx-auto" style="max-width: 400px;">
+                        <div class="card-body p-4">
+                            <!-- 登录标题 -->
+                            <div class="text-center mb-4">
+                                <i class="bi bi-lightning-charge-fill text-primary" style="font-size: 2.5rem;"></i>
+                                <h3 class="mt-3 mb-2 text-dark">管理员登录</h3>
+                                <p class="text-muted">请输入您的账户信息</p>
+                            </div>
+
+                            <!-- 错误提示 -->
+                            <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <span id="errorMessage"></span>
+                            </div>
+
+                            <!-- 登录表单 -->
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">
+                                        <i class="bi bi-person me-1"></i>用户名
+                                    </label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           placeholder="请输入用户名" value="admin" required>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">
+                                        <i class="bi bi-lock me-1"></i>密码
+                                    </label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="password" name="password" 
+                                               placeholder="请输入密码" value="admin123" required>
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="bi bi-eye" id="toggleIcon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">
+                                        记住我
+                                    </label>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-login btn-lg" id="loginBtn">
+                                        <span id="loginBtnText">
+                                            <i class="bi bi-box-arrow-in-right me-2"></i>登录
+                                        </span>
+                                        <span id="loginBtnLoading" class="d-none">
+                                            <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                            登录中...
+                                        </span>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- 默认账户提示 -->
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    默认管理员账户：admin / admin123
+                                </small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -161,5 +257,98 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 密码显示/隐藏切换
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.className = 'bi bi-eye-slash';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.className = 'bi bi-eye';
+            }
+        });
+
+        // 登录表单提交
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+            
+            // 显示加载状态
+            showLoading(true);
+            hideError();
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        rememberMe: rememberMe
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    // 登录成功，保存token并跳转
+                    localStorage.setItem('accessToken', result.data.accessToken);
+                    localStorage.setItem('userInfo', JSON.stringify(result.data.userInfo));
+                    
+                    // 跳转到控制台
+                    window.location.href = '/dashboard';
+                } else {
+                    // 登录失败，显示错误信息
+                    showError(result.msg || '登录失败');
+                }
+            } catch (error) {
+                console.error('登录请求失败:', error);
+                showError('网络错误，请稍后重试');
+            } finally {
+                showLoading(false);
+            }
+        });
+        
+        // 显示/隐藏加载状态
+        function showLoading(loading) {
+            const loginBtn = document.getElementById('loginBtn');
+            const loginBtnText = document.getElementById('loginBtnText');
+            const loginBtnLoading = document.getElementById('loginBtnLoading');
+            
+            if (loading) {
+                loginBtn.disabled = true;
+                loginBtnText.classList.add('d-none');
+                loginBtnLoading.classList.remove('d-none');
+            } else {
+                loginBtn.disabled = false;
+                loginBtnText.classList.remove('d-none');
+                loginBtnLoading.classList.add('d-none');
+            }
+        }
+        
+        // 显示错误信息
+        function showError(message) {
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            errorMessage.textContent = message;
+            errorAlert.classList.remove('d-none');
+        }
+        
+        // 隐藏错误信息
+        function hideError() {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.classList.add('d-none');
+        }
+    </script>
 </body>
 </html>
