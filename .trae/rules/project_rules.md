@@ -42,7 +42,6 @@ dto/ vo/ config/ exception/
 - Controller统一返回Result<T>格式
 - 所有业务接口添加SA-Token权限注解
 - 使用标准CRUD方法名：save/update/delete/page/getById
-- 接口 api 地址：/{模块}/{接口}，无需添加 /api 前缀，后续通过项目或者nginx反向代理添加
 
 ### 异常处理
 - 全局异常处理器
