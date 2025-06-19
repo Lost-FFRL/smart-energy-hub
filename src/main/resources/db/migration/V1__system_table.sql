@@ -34,4 +34,4 @@ CREATE TABLE IF NOT EXISTS `sys_user`
 
 -- 插入默认管理员用户（密码：admin123）
 INSERT INTO `sys_user` (`username`, `password`, `real_name`, `status`, `created_by`, `updated_by`)
-VALUES ('admin', '$2a$10$7JB720yubVSOfvVWbazBuOWShWvheWjxVYaGYoUaxMNh4qDql5KLO', '系统管理员', 1, 'system', 'system');
+VALUES ('admin', '$2a$10$OXLHX3DJP8.CnLfsjOotc.ksWgxyMRFsfpFhPRSB8GnETmedpi98G', '系统管理员', 1, 'system', 'system');
