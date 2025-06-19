@@ -1,4 +1,4 @@
-package com.kfblue.seh.constant;
+package com.kfblue.seh.constants;
 
 public class DateTypeConsts {
     public static final String MONTH = "month";

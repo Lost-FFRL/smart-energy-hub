@@ -1,6 +1,6 @@
 package com.kfblue.seh.service;
 
-import com.kfblue.seh.constant.DeviceTypeConstants;
+import com.kfblue.seh.constants.DeviceTypeConstants;
 import com.kfblue.seh.entity.Device;
 import com.kfblue.seh.entity.DeviceReading;
 import lombok.RequiredArgsConstructor;

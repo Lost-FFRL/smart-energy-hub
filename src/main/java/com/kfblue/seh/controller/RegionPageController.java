@@ -1,6 +1,5 @@
 package com.kfblue.seh.controller;
 
-import com.kfblue.seh.constants.ApiPaths;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

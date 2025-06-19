@@ -1,7 +1,6 @@
 package com.kfblue.seh.controller;
 
 import com.kfblue.seh.common.Result;
-import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.entity.DeviceDailyStatistics;
 import com.kfblue.seh.scheduler.DeviceDataScheduler;
 import com.kfblue.seh.service.DeviceDailyStatisticService;
@@ -23,7 +22,7 @@ import java.util.Set;
  */
 @Tag(name = "设备数据测试", description = "设备数据生成和统计测试接口")
 @RestController
-@RequestMapping(ApiPaths.API + "/test/device-data")
+@RequestMapping("/test/device-data")
 @RequiredArgsConstructor
 public class DeviceDataTestController {
 

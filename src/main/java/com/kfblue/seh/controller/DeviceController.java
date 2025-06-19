@@ -3,7 +3,6 @@ package com.kfblue.seh.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kfblue.seh.common.Result;
-import com.kfblue.seh.constants.ApiPaths;
 
 import com.kfblue.seh.entity.Device;
 import com.kfblue.seh.service.DeviceService;
@@ -23,7 +22,7 @@ import java.util.List;
  */
 @RestController
 @Tag(name = "设备管理")
-@RequestMapping(ApiPaths.API + "/device")
+@RequestMapping("/api/device")
 @RequiredArgsConstructor
 public class DeviceController {
 

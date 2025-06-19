@@ -1,4 +1,4 @@
-package com.kfblue.seh.constant;
+package com.kfblue.seh.constants;
 
 /**
  * 设备类型常量

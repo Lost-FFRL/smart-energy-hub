@@ -1,7 +1,6 @@
 package com.kfblue.seh.controller;
 
 import com.kfblue.seh.common.Result;
-import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.service.DeviceReadingService;
 import com.kfblue.seh.service.DeviceService;
 import com.kfblue.seh.service.RegionService;
@@ -26,7 +25,7 @@ import java.util.Set;
  */
 @Tag(name = "能耗信息", description = "能耗信息管理相关接口")
 @RestController
-@RequestMapping(ApiPaths.API + "/energy/info")
+@RequestMapping("/api/energy/info")
 @RequiredArgsConstructor
 public class EnergyInfoController {
     private final DeviceService deviceService;

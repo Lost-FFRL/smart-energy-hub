@@ -2,7 +2,6 @@ package com.kfblue.seh.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.kfblue.seh.common.Result;
-import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.dto.RegionDTO;
 import com.kfblue.seh.service.RegionService;
 import com.kfblue.seh.vo.RegionTreeVO;
@@ -23,7 +22,7 @@ import java.util.Map;
  * @since 2025-01-20
  */
 @RestController
-@RequestMapping(ApiPaths.API + "/regions")
+@RequestMapping("/api/regions")
 @RequiredArgsConstructor
 @SaCheckLogin
 public class RegionController {

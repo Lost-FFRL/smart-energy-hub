@@ -1,6 +1,6 @@
 package com.kfblue.seh.util;
 
-import com.kfblue.seh.constant.DateTypeConsts;
+import com.kfblue.seh.constants.DateTypeConsts;
 
 import java.time.LocalDate;
 import java.time.Month;

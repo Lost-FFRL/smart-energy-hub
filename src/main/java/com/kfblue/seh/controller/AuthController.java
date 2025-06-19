@@ -2,7 +2,6 @@ package com.kfblue.seh.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.kfblue.seh.common.Result;
-import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.dto.LoginDTO;
 import com.kfblue.seh.service.SysUserService;
 import com.kfblue.seh.vo.LoginVO;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Slf4j
 @RestController
-@RequestMapping(ApiPaths.API + "/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Tag(name = "认证管理", description = "用户登录、登出等认证相关接口")
 public class AuthController {

@@ -1,8 +1,7 @@
 package com.kfblue.seh.controller;
 
 import com.kfblue.seh.common.Result;
-import com.kfblue.seh.constant.DateTypeConsts;
-import com.kfblue.seh.constants.ApiPaths;
+import com.kfblue.seh.constants.DateTypeConsts;
 import com.kfblue.seh.service.DeviceDailyStatisticService;
 import com.kfblue.seh.service.DeviceReadingService;
 import com.kfblue.seh.service.DeviceService;
@@ -29,7 +28,7 @@ import java.util.List;
  */
 @Tag(name = "能耗分析", description = "能耗分析管理相关接口")
 @RestController
-@RequestMapping(ApiPaths.API + "/energy/analysis")
+@RequestMapping("/api/energy/analysis")
 @RequiredArgsConstructor
 public class EnergyAnalysisController {
     private final DeviceService deviceService;
