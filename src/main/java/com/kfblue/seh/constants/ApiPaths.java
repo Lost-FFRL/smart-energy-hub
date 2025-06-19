@@ -19,61 +19,6 @@ public class ApiPaths {
      */
     public static final String API_V0 = API_PREFIX;
 
-    // ==================== 业务模块路径 ====================
-
-
-    /**
-     * 区域管理接口路径
-     */
-    public static final String REGIONS = API_V0 + "/regions";
-
-    /**
-     * 用户管理接口路径
-     */
-    public static final String USERS = API_V0 + "/users";
-
-    /**
-     * 设备管理接口路径
-     */
-    public static final String DEVICES = API_V0 + "/devices";
-
-    /**
-     * 数据分析接口路径
-     */
-    public static final String ANALYSIS = API_V0 + "/analysis";
-
-    /**
-     * 能源分析接口路径
-     */
-    public static final String ENERGY_ANALYSIS = API_V0 + "/energy/analysis";
-
-    /**
-     * 能源查询接口路径
-     */
-    public static final String ENERGY_QUERY = API_V0 + "/energy/query";
-
-    /**
-     * 能源信息接口路径
-     */
-    public static final String ENERGY_INFO = API_V0 + "/energy/info";
-
-    /**
-     * 演示接口路径
-     */
-    public static final String DEMO = API_V0 + "/demo";
-
-    /**
-     * 系统管理接口路径
-     */
-    public static final String SYSTEM = API_V0 + "/system";
-
-    // ==================== 页面路径 ====================
-
-    /**
-     * 区域管理页面路径
-     */
-    public static final String REGION_MANAGEMENT_PAGE = "/region-management";
-
     /**
      * 私有构造函数，防止实例化
      */
