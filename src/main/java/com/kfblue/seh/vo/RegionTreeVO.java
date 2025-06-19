@@ -3,16 +3,16 @@ package com.kfblue.seh.vo;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.util.List;
 
 /**
- * 区域视图对象
+ * 区域树形结构视图对象
  *
  * @author system
  * @since 2025-01-20
  */
 @Data
-public class RegionVO {
+public class RegionTreeVO {
 
     /**
      * 区域ID
@@ -35,11 +35,6 @@ public class RegionVO {
     private Long parentId;
 
     /**
-     * 父级区域名称
-     */
-    private String parentName;
-
-    /**
      * 区域层级(1:一级,2:二级,3:三级等)
      */
     private Integer regionLevel;
@@ -60,39 +55,9 @@ public class RegionVO {
     private String regionType;
 
     /**
-     * 区域类型显示名称
-     */
-    private String regionTypeLabel;
-
-    /**
      * 状态(0:禁用,1:启用)
      */
     private Integer status;
-
-    /**
-     * 状态显示名称
-     */
-    private String statusLabel;
-
-    /**
-     * 创建人
-     */
-    private String createdBy;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createdAt;
-
-    /**
-     * 修改人
-     */
-    private String updatedBy;
-
-    /**
-     * 修改时间
-     */
-    private LocalDateTime updatedAt;
 
     /**
      * 备注信息
@@ -100,12 +65,27 @@ public class RegionVO {
     private String remark;
 
     /**
-     * 设备数量
+     * 子区域列表
      */
-    private Integer deviceCount;
+    private List<RegionTreeVO> children;
 
     /**
      * 是否有子节点
      */
     private Boolean hasChildren;
+
+    /**
+     * 设备数量
+     */
+    private Integer deviceCount;
+
+    /**
+     * 区域类型显示名称
+     */
+    private String regionTypeLabel;
+
+    /**
+     * 状态显示名称
+     */
+    private String statusLabel;
 }

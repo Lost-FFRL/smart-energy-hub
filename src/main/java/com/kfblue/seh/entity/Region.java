@@ -1,15 +1,13 @@
 package com.kfblue.seh.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.math.BigDecimal;
-
 /**
  * 区域实体类
- * 
+ *
  * @author system
  * @since 2025-06-17
  */
@@ -34,33 +32,33 @@ public class Region extends BaseEntity {
     private Long parentId;
 
     /**
-     * 区域层级(1:一级,2:二级,3:三级等)
+     * 区域层级
      */
     private Integer regionLevel;
 
     /**
-     * 区域路径,用/分隔
+     * 区域路径
      */
     private String regionPath;
 
     /**
-     * 区域面积(平方米)
+     * 区域面积
      */
-    private BigDecimal areaSize;
+    private Double areaSize;
 
     /**
-     * 区域类型(office:办公,workshop:车间,dormitory:宿舍等)
+     * 区域类型
      */
     private String regionType;
 
     /**
-     * 状态(0:禁用,1:启用)
+     * 状态：1-启用，0-禁用
      */
     private Integer status;
 
     /**
-     * 逻辑删除标记(0:正常,1:删除)
+     * 备注
      */
-    @TableLogic
-    private Integer deleted;
+    private String remark;
+
 }

@@ -139,8 +139,8 @@ public class DeviceDailyStatisticService extends ServiceImpl<DeviceDailyStatisti
                        increment.compareTo(BigDecimal.valueOf(100)) > 0) ? 1 : 0;
             })
             .sum();
-        statistics.setAbnormalCount((int) abnormalCount);
-        statistics.setNormalCount(readings.size() - (int) abnormalCount);
+        statistics.setAbnormalCount(Integer.valueOf((int) abnormalCount));
+        statistics.setNormalCount(Integer.valueOf(readings.size() - (int) abnormalCount));
         
         // 计算数据完整性（假设每小时应该有一个数据点）
         int expectedDataPoints = 24; // 一天24小时

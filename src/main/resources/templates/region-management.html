@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>区域管理 - 智慧能源管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/element-plus@2.4.4/dist/index.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .main-content {
+            margin-left: 0;
+        }
+        @media (min-width: 768px) {
+            .main-content {
+                margin-left: 250px;
+            }
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .region-tree {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .region-info {
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+        .tree-node {
+            padding: 8px 12px;
+            margin: 2px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        .tree-node:hover {
+            background-color: #f8f9fa;
+            border-left-color: #007bff;
+        }
+        .tree-node.active {
+            background-color: #e3f2fd;
+            border-left-color: #2196f3;
+            color: #1976d2;
+        }
+        .tree-node .node-icon {
+            margin-right: 8px;
+            width: 16px;
+            text-align: center;
+        }
+        .tree-children {
+            margin-left: 20px;
+            border-left: 1px dashed #dee2e6;
+            padding-left: 10px;
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+        }
+        .btn-group-sm .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .form-floating label {
+            color: #6c757d;
+        }
+        .region-stats {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        .search-box {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            padding: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <div class="d-flex">
+        <nav class="sidebar position-fixed d-none d-md-block" style="width: 250px;">
+            <div class="p-3">
+                <h4 class="mb-4">
+                    <i class="bi bi-lightning-charge"></i>
+                    智慧能源管理
+                </h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            控制台
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/region-management">
+                            <i class="bi bi-building me-2"></i>
+                            区域管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/device-management">
+                            <i class="bi bi-cpu me-2"></i>
+                            设备管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/energy-analysis">
+                            <i class="bi bi-graph-up me-2"></i>
+                            能耗分析
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/energy-query">
+                            <i class="bi bi-search me-2"></i>
+                            能耗查询
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mt-auto p-3">
+                <div class="dropdown">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle me-2"></i>
+                        <span>管理员</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="#">个人设置</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout">退出登录</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content flex-grow-1">
+            <div class="container-fluid p-4">
+                <!-- 页面标题 -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="mb-1">区域管理</h2>
+                        <p class="text-muted mb-0">管理系统中的区域信息，支持树形结构展示和完整的CRUD操作</p>
+                    </div>
+                    <button class="btn btn-primary" @click="showCreateDialog">
+                        <i class="bi bi-plus-lg me-2"></i>
+                        新增区域
+                    </button>
+                </div>
+
+                <!-- 统计信息 -->
+                <div class="region-stats">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ regionStats.totalRegions }}</div>
+                                <div class="stat-label">总区域数</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ regionStats.activeRegions }}</div>
+                                <div class="stat-label">启用区域</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ regionStats.totalDevices }}</div>
+                                <div class="stat-label">关联设备</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-item">
+                                <div class="stat-number">{{ regionStats.maxLevel }}</div>
+                                <div class="stat-label">最大层级</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主要内容区域 -->
+                <div class="row">
+                    <!-- 左侧：区域树 -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="search-box">
+                                <h5 class="mb-3">区域结构</h5>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="搜索区域..." v-model="searchKeyword" @input="filterTree">
+                                    <button class="btn btn-outline-secondary" type="button" @click="refreshTree">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="region-tree p-3">
+                                <div v-if="filteredRegionTree.length === 0" class="text-center text-muted py-4">
+                                    <i class="bi bi-folder2-open fs-1 d-block mb-2"></i>
+                                    <p>暂无区域数据</p>
+                                </div>
+                                <div v-else>
+                                    <region-tree-node 
+                                        v-for="region in filteredRegionTree" 
+                                        :key="region.id"
+                                        :node="region"
+                                        :selected-id="selectedRegionId"
+                                        @select="selectRegion"
+                                        @edit="showEditDialog"
+                                        @delete="deleteRegion">
+                                    </region-tree-node>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：区域信息 -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">区域详情</h5>
+                                <div class="btn-group btn-group-sm" v-if="selectedRegion">
+                                    <button class="btn btn-outline-primary" @click="showEditDialog(selectedRegion)">
+                                        <i class="bi bi-pencil"></i> 编辑
+                                    </button>
+                                    <button class="btn btn-outline-success" @click="showCreateDialog(selectedRegion.id)">
+                                        <i class="bi bi-plus"></i> 添加子区域
+                                    </button>
+                                    <button class="btn btn-outline-danger" @click="deleteRegion(selectedRegion.id)">
+                                        <i class="bi bi-trash"></i> 删除
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="region-info card-body">
+                                <div v-if="!selectedRegion" class="text-center text-muted py-5">
+                                    <i class="bi bi-building fs-1 d-block mb-3"></i>
+                                    <h5>请选择一个区域</h5>
+                                    <p>从左侧区域树中选择一个区域查看详细信息</p>
+                                </div>
+                                <div v-else>
+                                    <!-- 基本信息 -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">区域编码</label>
+                                                <p class="form-control-plaintext">{{ selectedRegion.regionCode }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">区域名称</label>
+                                                <p class="form-control-plaintext">{{ selectedRegion.regionName }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">区域类型</label>
+                                                <p class="form-control-plaintext">
+                                                    <span class="badge bg-info">{{ selectedRegion.regionTypeLabel }}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">区域层级</label>
+                                                <p class="form-control-plaintext">第 {{ selectedRegion.regionLevel }} 级</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">区域面积</label>
+                                                <p class="form-control-plaintext">{{ selectedRegion.areaSize || '未设置' }} m²</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">状态</label>
+                                                <p class="form-control-plaintext">
+                                                    <span :class="selectedRegion.status === 1 ? 'badge bg-success' : 'badge bg-secondary'">
+                                                        {{ selectedRegion.statusLabel }}
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 统计信息 -->
+                                    <div class="row mb-4">
+                                        <div class="col-12">
+                                            <h6 class="fw-bold mb-3">统计信息</h6>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="text-center p-3 bg-light rounded">
+                                                        <div class="fs-4 fw-bold text-primary">{{ selectedRegion.deviceCount || 0 }}</div>
+                                                        <div class="small text-muted">关联设备</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="text-center p-3 bg-light rounded">
+                                                        <div class="fs-4 fw-bold text-success">{{ getChildrenCount(selectedRegion.id) }}</div>
+                                                        <div class="small text-muted">子区域数</div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="text-center p-3 bg-light rounded">
+                                                        <div class="fs-4 fw-bold text-info">{{ selectedRegion.regionPath }}</div>
+                                                        <div class="small text-muted">区域路径</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 其他信息 -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="fw-bold mb-3">其他信息</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">创建人</label>
+                                                        <p class="form-control-plaintext">{{ selectedRegion.createdBy || '系统' }}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">创建时间</label>
+                                                        <p class="form-control-plaintext">{{ formatDate(selectedRegion.createdAt) }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">修改人</label>
+                                                        <p class="form-control-plaintext">{{ selectedRegion.updatedBy || '系统' }}</p>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label class="form-label fw-bold">修改时间</label>
+                                                        <p class="form-control-plaintext">{{ formatDate(selectedRegion.updatedAt) }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3" v-if="selectedRegion.remark">
+                                                <label class="form-label fw-bold">备注</label>
+                                                <p class="form-control-plaintext">{{ selectedRegion.remark }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/编辑区域对话框 -->
+    <div class="modal fade" id="regionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ isEdit ? '编辑区域' : '新增区域' }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="saveRegion">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="regionCode" v-model="regionForm.regionCode" required>
+                                    <label for="regionCode">区域编码 *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="regionName" v-model="regionForm.regionName" required>
+                                    <label for="regionName">区域名称 *</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="parentId" v-model="regionForm.parentId">
+                                        <option value="">无父区域（顶级区域）</option>
+                                        <option v-for="region in flatRegionList" :key="region.id" :value="region.id">
+                                            {{ '　'.repeat(region.regionLevel - 1) }}{{ region.regionName }}
+                                        </option>
+                                    </select>
+                                    <label for="parentId">父区域</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="regionType" v-model="regionForm.regionType" required>
+                                        <option value="office">办公区域</option>
+                                        <option value="workshop">车间区域</option>
+                                        <option value="dormitory">宿舍区域</option>
+                                        <option value="other">其他区域</option>
+                                    </select>
+                                    <label for="regionType">区域类型 *</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" id="regionLevel" v-model="regionForm.regionLevel" required min="1">
+                                    <label for="regionLevel">区域层级 *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" id="areaSize" v-model="regionForm.areaSize" step="0.01" min="0">
+                                    <label for="areaSize">区域面积（m²）</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" id="status" v-model="regionForm.status">
+                                        <option value="1">启用</option>
+                                        <option value="0">禁用</option>
+                                    </select>
+                                    <label for="status">状态</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <textarea class="form-control" id="remark" v-model="regionForm.remark" style="height: 100px"></textarea>
+                            <label for="remark">备注</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" @click="saveRegion">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.5.0/dist/axios.min.js"></script>
+    <script>
+        // 区域树节点组件
+        const RegionTreeNode = {
+            name: 'RegionTreeNode',
+            props: ['node', 'selectedId'],
+            emits: ['select', 'edit', 'delete'],
+            data() {
+                return {
+                    expanded: false
+                }
+            },
+            template: `
+                <div>
+                    <div class="tree-node" :class="{ active: node.id === selectedId }" @click="selectNode">
+                        <span class="node-icon" @click.stop="toggleExpand" v-if="node.hasChildren">
+                            <i :class="expanded ? 'bi bi-chevron-down' : 'bi bi-chevron-right'"></i>
+                        </span>
+                        <span class="node-icon" v-else>
+                            <i class="bi bi-dot"></i>
+                        </span>
+                        <i class="bi bi-building me-2"></i>
+                        <span class="me-2">{{ node.regionName }}</span>
+                        <span class="badge bg-secondary status-badge me-1">{{ node.regionTypeLabel }}</span>
+                        <span :class="node.status === 1 ? 'badge bg-success status-badge' : 'badge bg-secondary status-badge'">{{ node.statusLabel }}</span>
+                        <div class="float-end">
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-primary btn-sm" @click.stop="editNode" title="编辑">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" @click.stop="deleteNode" title="删除">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tree-children" v-if="expanded && node.children && node.children.length > 0">
+                        <region-tree-node 
+                            v-for="child in node.children" 
+                            :key="child.id"
+                            :node="child"
+                            :selected-id="selectedId"
+                            @select="$emit('select', $event)"
+                            @edit="$emit('edit', $event)"
+                            @delete="$emit('delete', $event)">
+                        </region-tree-node>
+                    </div>
+                </div>
+            `,
+            methods: {
+                selectNode() {
+                    this.$emit('select', this.node.id);
+                },
+                editNode() {
+                    this.$emit('edit', this.node);
+                },
+                deleteNode() {
+                    this.$emit('delete', this.node.id);
+                },
+                toggleExpand() {
+                    this.expanded = !this.expanded;
+                }
+            }
+        };
+
+        // 主应用
+        const { createApp } = Vue;
+        createApp({
+            components: {
+                RegionTreeNode
+            },
+            data() {
+                return {
+                    regionTree: [],
+                    filteredRegionTree: [],
+                    selectedRegionId: null,
+                    selectedRegion: null,
+                    searchKeyword: '',
+                    regionStats: {
+                        totalRegions: 0,
+                        activeRegions: 0,
+                        totalDevices: 0,
+                        maxLevel: 0
+                    },
+                    flatRegionList: [],
+                    isEdit: false,
+                    regionForm: {
+                        regionCode: '',
+                        regionName: '',
+                        parentId: '',
+                        regionLevel: 1,
+                        areaSize: '',
+                        regionType: 'office',
+                        status: 1,
+                        remark: ''
+                    },
+                    modal: null
+                }
+            },
+            mounted() {
+                this.loadRegionTree();
+                this.loadRegionStats();
+                this.modal = new bootstrap.Modal(document.getElementById('regionModal'));
+            },
+            methods: {
+                async loadRegionTree() {
+                    try {
+                        const response = await axios.get('/api/regions/tree');
+                        this.regionTree = response.data.data || [];
+                        this.filteredRegionTree = [...this.regionTree];
+                        this.buildFlatRegionList();
+                    } catch (error) {
+                        console.error('加载区域树失败:', error);
+                        alert('加载区域树失败');
+                    }
+                },
+                async loadRegionStats() {
+                    // 这里可以调用统计接口，暂时用模拟数据
+                    this.regionStats = {
+                        totalRegions: this.countAllRegions(this.regionTree),
+                        activeRegions: this.countActiveRegions(this.regionTree),
+                        totalDevices: this.countAllDevices(this.regionTree),
+                        maxLevel: this.getMaxLevel(this.regionTree)
+                    };
+                },
+                async selectRegion(regionId) {
+                    this.selectedRegionId = regionId;
+                    try {
+                        const response = await axios.get(`/api/regions/${regionId}`);
+                        this.selectedRegion = response.data.data;
+                    } catch (error) {
+                        console.error('加载区域详情失败:', error);
+                        alert('加载区域详情失败');
+                    }
+                },
+                showCreateDialog(parentId = null) {
+                    this.isEdit = false;
+                    this.regionForm = {
+                        regionCode: '',
+                        regionName: '',
+                        parentId: parentId || '',
+                        regionLevel: parentId ? this.getRegionLevel(parentId) + 1 : 1,
+                        areaSize: '',
+                        regionType: 'office',
+                        status: 1,
+                        remark: ''
+                    };
+                    this.modal.show();
+                },
+                showEditDialog(region) {
+                    this.isEdit = true;
+                    this.regionForm = {
+                        regionCode: region.regionCode,
+                        regionName: region.regionName,
+                        parentId: region.parentId || '',
+                        regionLevel: region.regionLevel,
+                        areaSize: region.areaSize || '',
+                        regionType: region.regionType,
+                        status: region.status,
+                        remark: region.remark || ''
+                    };
+                    this.modal.show();
+                },
+                async saveRegion() {
+                    try {
+                        if (this.isEdit) {
+                            await axios.put(`/api/regions/${this.selectedRegion.id}`, this.regionForm);
+                            alert('更新区域成功');
+                        } else {
+                            await axios.post('/api/regions', this.regionForm);
+                            alert('创建区域成功');
+                        }
+                        this.modal.hide();
+                        this.loadRegionTree();
+                        this.loadRegionStats();
+                    } catch (error) {
+                        console.error('保存区域失败:', error);
+                        alert('保存区域失败: ' + (error.response?.data?.msg || error.message));
+                    }
+                },
+                async deleteRegion(regionId) {
+                    if (!confirm('确定要删除这个区域吗？删除后不可恢复。')) {
+                        return;
+                    }
+                    try {
+                        await axios.delete(`/api/regions/${regionId}`);
+                        alert('删除区域成功');
+                        this.loadRegionTree();
+                        this.loadRegionStats();
+                        if (this.selectedRegionId === regionId) {
+                            this.selectedRegionId = null;
+                            this.selectedRegion = null;
+                        }
+                    } catch (error) {
+                        console.error('删除区域失败:', error);
+                        alert('删除区域失败: ' + (error.response?.data?.msg || error.message));
+                    }
+                },
+                refreshTree() {
+                    this.loadRegionTree();
+                    this.loadRegionStats();
+                },
+                filterTree() {
+                    if (!this.searchKeyword.trim()) {
+                        this.filteredRegionTree = [...this.regionTree];
+                        return;
+                    }
+                    this.filteredRegionTree = this.filterRegionTree(this.regionTree, this.searchKeyword.toLowerCase());
+                },
+                filterRegionTree(regions, keyword) {
+                    return regions.filter(region => {
+                        const matches = region.regionName.toLowerCase().includes(keyword) || 
+                                       region.regionCode.toLowerCase().includes(keyword);
+                        if (matches) {
+                            return true;
+                        }
+                        if (region.children && region.children.length > 0) {
+                            const filteredChildren = this.filterRegionTree(region.children, keyword);
+                            if (filteredChildren.length > 0) {
+                                region.children = filteredChildren;
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                },
+                buildFlatRegionList() {
+                    this.flatRegionList = [];
+                    this.flattenRegionTree(this.regionTree);
+                },
+                flattenRegionTree(regions) {
+                    regions.forEach(region => {
+                        this.flatRegionList.push(region);
+                        if (region.children && region.children.length > 0) {
+                            this.flattenRegionTree(region.children);
+                        }
+                    });
+                },
+                getRegionLevel(regionId) {
+                    const region = this.flatRegionList.find(r => r.id === regionId);
+                    return region ? region.regionLevel : 0;
+                },
+                getChildrenCount(regionId) {
+                    const region = this.findRegionInTree(this.regionTree, regionId);
+                    return region && region.children ? region.children.length : 0;
+                },
+                findRegionInTree(regions, regionId) {
+                    for (const region of regions) {
+                        if (region.id === regionId) {
+                            return region;
+                        }
+                        if (region.children && region.children.length > 0) {
+                            const found = this.findRegionInTree(region.children, regionId);
+                            if (found) {
+                                return found;
+                            }
+                        }
+                    }
+                    return null;
+                },
+                countAllRegions(regions) {
+                    let count = regions.length;
+                    regions.forEach(region => {
+                        if (region.children && region.children.length > 0) {
+                            count += this.countAllRegions(region.children);
+                        }
+                    });
+                    return count;
+                },
+                countActiveRegions(regions) {
+                    let count = regions.filter(r => r.status === 1).length;
+                    regions.forEach(region => {
+                        if (region.children && region.children.length > 0) {
+                            count += this.countActiveRegions(region.children);
+                        }
+                    });
+                    return count;
+                },
+                countAllDevices(regions) {
+                    let count = regions.reduce((sum, region) => sum + (region.deviceCount || 0), 0);
+                    regions.forEach(region => {
+                        if (region.children && region.children.length > 0) {
+                            count += this.countAllDevices(region.children);
+                        }
+                    });
+                    return count;
+                },
+                getMaxLevel(regions) {
+                    let maxLevel = 0;
+                    regions.forEach(region => {
+                        maxLevel = Math.max(maxLevel, region.regionLevel);
+                        if (region.children && region.children.length > 0) {
+                            maxLevel = Math.max(maxLevel, this.getMaxLevel(region.children));
+                        }
+                    });
+                    return maxLevel;
+                },
+                formatDate(dateString) {
+                    if (!dateString) return '未知';
+                    return new Date(dateString).toLocaleString('zh-CN');
+                }
+            }
+        }).mount('body');
+    </script>
+</body>
+</html>
