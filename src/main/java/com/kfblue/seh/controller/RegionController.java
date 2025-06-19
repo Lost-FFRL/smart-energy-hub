@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2025-01-20
  */
 @RestController
-@RequestMapping(ApiPaths.API_V0 + "/regions")
+@RequestMapping(ApiPaths.API + "/regions")
 @RequiredArgsConstructor
 @SaCheckLogin
 public class RegionController {

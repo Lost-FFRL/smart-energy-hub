@@ -1,8 +1,6 @@
 package com.kfblue.seh.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kfblue.seh.common.Result;
 import com.kfblue.seh.constants.ApiPaths;
@@ -10,11 +8,8 @@ import com.kfblue.seh.constants.ApiPaths;
 import com.kfblue.seh.entity.Device;
 import com.kfblue.seh.service.DeviceService;
 
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -28,7 +23,7 @@ import java.util.List;
  */
 @RestController
 @Tag(name = "设备管理")
-@RequestMapping(ApiPaths.API_V0 + "/device")
+@RequestMapping(ApiPaths.API + "/device")
 @RequiredArgsConstructor
 public class DeviceController {
 

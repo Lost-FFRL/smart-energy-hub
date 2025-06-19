@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @Tag(name = "示例代码")
-@RequestMapping(ApiPaths.API_V0 + "/demo")
+@RequestMapping(ApiPaths.API + "/demo")
 @RequiredArgsConstructor
 public class DemoController {
 

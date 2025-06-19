@@ -28,7 +28,7 @@ import java.util.Set;
 
 @Tag(name = "能耗查询", description = "能耗查询")
 @RestController
-@RequestMapping(ApiPaths.API_V0 + "/energy/query")
+@RequestMapping(ApiPaths.API + "/energy/query")
 @RequiredArgsConstructor
 public class EnergyQueryController {
     private final DeviceService deviceService;

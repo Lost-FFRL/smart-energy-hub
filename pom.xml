@@ -148,12 +148,15 @@
         </dependency>
 
         <!-- Spring Boot DevTools 热更新 -->
+        <!-- DevTools temporarily disabled to prevent auto-restart issues -->
+        <!--
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        -->
         
         <dependency>
             <groupId>org.projectlombok</groupId>

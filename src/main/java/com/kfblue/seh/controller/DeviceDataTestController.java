@@ -23,7 +23,7 @@ import java.util.Set;
  */
 @Tag(name = "设备数据测试", description = "设备数据生成和统计测试接口")
 @RestController
-@RequestMapping(ApiPaths.API_V0 + "/test/device-data")
+@RequestMapping(ApiPaths.API + "/test/device-data")
 @RequiredArgsConstructor
 public class DeviceDataTestController {
 

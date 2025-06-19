@@ -17,7 +17,7 @@ public class ApiPaths {
      * 当前API版本前缀 (v0)
      * v0版本：/api 后面直接接业务模块
      */
-    public static final String API_V0 = API_PREFIX;
+    public static final String API = API_PREFIX;
 
     /**
      * 私有构造函数，防止实例化

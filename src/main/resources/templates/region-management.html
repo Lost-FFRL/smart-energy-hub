@@ -583,7 +583,7 @@
             methods: {
                 async loadRegionTree() {
                     try {
-                        const response = await axios.get('/api/regions/tree');
+                        const response = await axios.get('/api/v0/regions/tree');
                         this.regionTree = response.data.data || [];
                         this.filteredRegionTree = [...this.regionTree];
                         this.buildFlatRegionList();
@@ -604,7 +604,7 @@
                 async selectRegion(regionId) {
                     this.selectedRegionId = regionId;
                     try {
-                        const response = await axios.get(`/api/regions/${regionId}`);
+                        const response = await axios.get(`/api/v0/regions/${regionId}`);
                         this.selectedRegion = response.data.data;
                     } catch (error) {
                         console.error('加载区域详情失败:', error);
@@ -642,10 +642,10 @@
                 async saveRegion() {
                     try {
                         if (this.isEdit) {
-                            await axios.put(`/api/regions/${this.selectedRegion.id}`, this.regionForm);
+                            await axios.put(`/api/v0/regions/${this.selectedRegion.id}`, this.regionForm);
                             alert('更新区域成功');
                         } else {
-                            await axios.post('/api/regions', this.regionForm);
+                            await axios.post('/api/v0/regions', this.regionForm);
                             alert('创建区域成功');
                         }
                         this.modal.hide();
@@ -661,7 +661,7 @@
                         return;
                     }
                     try {
-                        await axios.delete(`/api/regions/${regionId}`);
+                        await axios.delete(`/api/v0/regions/${regionId}`);
                         alert('删除区域成功');
                         this.loadRegionTree();
                         this.loadRegionStats();

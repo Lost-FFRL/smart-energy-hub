@@ -29,7 +29,7 @@ import java.util.List;
  */
 @Tag(name = "能耗分析", description = "能耗分析管理相关接口")
 @RestController
-@RequestMapping(ApiPaths.API_V0 + "/energy/analysis")
+@RequestMapping(ApiPaths.API + "/energy/analysis")
 @RequiredArgsConstructor
 public class EnergyAnalysisController {
     private final DeviceService deviceService;
