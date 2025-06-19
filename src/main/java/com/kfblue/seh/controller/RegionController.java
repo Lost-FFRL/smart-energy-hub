@@ -1,6 +1,5 @@
 package com.kfblue.seh.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.kfblue.seh.common.Result;
 import com.kfblue.seh.dto.RegionDTO;
 import com.kfblue.seh.service.RegionService;
@@ -24,7 +23,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/regions")
 @RequiredArgsConstructor
-@SaCheckLogin
 public class RegionController {
 
     private final RegionService regionService;
