@@ -6,35 +6,12 @@
     <title>设备管理 - 智慧能源管理系统</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- 引入侧边栏样式 -->
+    <div th:replace="fragments/sidebar :: sidebar-styles"></div>
     <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Microsoft YaHei', sans-serif;
-        }
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 250px;
-            z-index: 1000;
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 8px;
-            margin: 2px 0;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .main-content {
-            margin-left: 250px;
-            padding: 20px;
         }
         .card {
             border: none;
@@ -171,56 +148,8 @@
     </style>
 </head>
 <body>
-    <!-- 侧边栏 -->
-    <nav class="sidebar d-flex flex-column p-3">
-        <div class="d-flex align-items-center mb-4">
-            <i class="bi bi-lightning-charge-fill me-2 fs-4"></i>
-            <span class="fs-5 fw-bold">智慧能源管理</span>
-        </div>
-        
-        <ul class="nav nav-pills flex-column mb-auto">
-            <li class="nav-item">
-                <a href="/dashboard" class="nav-link">
-                    <i class="bi bi-speedometer2 me-2"></i>
-                    控制台
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/region-management" class="nav-link">
-                    <i class="bi bi-geo-alt me-2"></i>
-                    区域管理
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/device-management" class="nav-link active">
-                    <i class="bi bi-cpu me-2"></i>
-                    设备管理
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/energy-analysis" class="nav-link">
-                    <i class="bi bi-bar-chart me-2"></i>
-                    能耗分析
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="/energy-query" class="nav-link">
-                    <i class="bi bi-search me-2"></i>
-                    能耗查询
-                </a>
-            </li>
-        </ul>
-        
-        <div class="dropdown">
-            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
-                <i class="bi bi-person-circle me-2"></i>
-                <span id="userWelcome">用户</span>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                <li><a class="dropdown-item" href="#" onclick="logout()">退出登录</a></li>
-            </ul>
-        </div>
-    </nav>
+    <!-- 引入共用侧边栏 -->
+    <div th:replace="fragments/sidebar :: sidebar('device-management')"></div>
 
     <!-- 主内容区域 -->
     <main class="main-content">
@@ -481,5 +410,8 @@
     <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/device-management.js"></script>
+    
+    <!-- 引入侧边栏脚本 -->
+    <div th:replace="fragments/sidebar :: sidebar-scripts"></div>
 </body>
 </html>

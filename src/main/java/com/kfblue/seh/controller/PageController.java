@@ -62,14 +62,30 @@ public class PageController {
         return "device-management";
     }
     
-
+    /**
+     * 区域管理页面
+     */
+    @GetMapping("/region-management")
+    public String regionManagement(Model model) {
+        StpUtil.checkLogin();
+        return "region-management";
+    }
     
     /**
-     * 系统配置页面
+     * 能耗分析页面
      */
-    @GetMapping("/admin/system")
-    public String systemConfig(Model model) {
+    @GetMapping("/energy-analysis")
+    public String energyAnalysis(Model model) {
         StpUtil.checkLogin();
-        return "admin/system/config";
+        return "energy-analysis";
+    }
+    
+    /**
+     * 能耗查询页面
+     */
+    @GetMapping("/energy-query")
+    public String energyQuery(Model model) {
+        StpUtil.checkLogin();
+        return "energy-query";
     }
 }
