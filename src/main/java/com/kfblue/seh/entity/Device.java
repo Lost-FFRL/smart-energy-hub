@@ -104,10 +104,4 @@ public class Device extends BaseEntity {
      * 设备状态(0:停用,1:正常,2:维修)
      */
     private Integer status;
-
-    /**
-     * 逻辑删除标记(0:正常,1:删除)
-     */
-    @TableLogic
-    private Integer deleted;
 }

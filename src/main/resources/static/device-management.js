@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     loadUserInfo();
     loadDevices();
+    loadRegions(); // 加载区域列表
     
     // 绑定搜索事件
     document.getElementById('searchInput').addEventListener('keypress', function(e) {
@@ -240,6 +241,7 @@ async function editDevice(id) {
             document.getElementById('deviceCode').value = device.deviceCode || '';
             document.getElementById('deviceName').value = device.deviceName || '';
             document.getElementById('deviceType').value = device.deviceType || '';
+            document.getElementById('regionId').value = device.regionId || '';
             document.getElementById('deviceModel').value = device.deviceModel || '';
             document.getElementById('manufacturer').value = device.manufacturer || '';
             document.getElementById('installDate').value = device.installDate || '';
@@ -276,6 +278,7 @@ async function saveDevice() {
             deviceCode: formData.get('deviceCode'),
             deviceName: formData.get('deviceName'),
             deviceType: formData.get('deviceType'),
+            regionId: formData.get('regionId') ? parseInt(formData.get('regionId')) : null,
             deviceModel: formData.get('deviceModel'),
             manufacturer: formData.get('manufacturer'),
             installDate: formData.get('installDate'),
@@ -362,6 +365,40 @@ function showSuccess(message) {
 function showError(message) {
     // 简单的错误提示，可以后续改为更美观的提示组件
     alert(message);
+}
+
+// 加载区域列表
+async function loadRegions() {
+    try {
+        const response = await fetch('/api/regions/tree');
+        const result = await response.json();
+        
+        if (result.code === 200) {
+            const regionSelect = document.getElementById('regionId');
+            regionSelect.innerHTML = '<option value="">请选择区域</option>';
+            
+            // 递归添加区域选项
+            function addRegionOptions(regions, level = 0) {
+                regions.forEach(region => {
+                    const option = document.createElement('option');
+                    option.value = region.id;
+                    option.textContent = '　'.repeat(level) + region.regionName;
+                    regionSelect.appendChild(option);
+                    
+                    // 如果有子区域，递归添加
+                    if (region.children && region.children.length > 0) {
+                        addRegionOptions(region.children, level + 1);
+                    }
+                });
+            }
+            
+            addRegionOptions(result.data);
+        } else {
+            console.error('加载区域列表失败：', result.message);
+        }
+    } catch (error) {
+        console.error('加载区域列表错误:', error);
+    }
 }
 
 // 点击模态框外部关闭

@@ -345,6 +345,16 @@
                             
                             <div class="col-md-6">
                                 <div class="form-floating">
+                                    <select class="form-select" id="regionId" name="regionId" required>
+                                        <option value="">请选择所属区域</option>
+                                        <!-- 区域选项将通过JavaScript动态加载 -->
+                                    </select>
+                                    <label for="regionId">所属区域 *</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
                                     <select class="form-select" id="deviceType" name="deviceType" required>
                                         <option value="">请选择设备类型</option>
                                         <option value="water">水表</option>
