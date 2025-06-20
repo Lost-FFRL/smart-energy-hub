@@ -1,5 +1,6 @@
 package com.kfblue.seh.controller;
 
+import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ public class RegionPageController {
      */
     @GetMapping
     public String regionManagement() {
+        StpUtil.checkLogin();
         return "region-management";
     }
 }

@@ -69,8 +69,9 @@ async function loadDevices(page = 1) {
         currentPage = page;
         const searchKeyword = document.getElementById('searchInput').value;
         const statusFilter = document.getElementById('statusFilter').value;
+        const deviceTypeFilter = document.getElementById('deviceTypeFilter').value;
         
-        let url = `/api/device/page?current=${page}&size=${pageSize}`;
+        let url = `/api/device?current=${page}&size=${pageSize}`;
         
         if (searchKeyword) {
             url += `&keyword=${encodeURIComponent(searchKeyword)}`;
@@ -78,6 +79,10 @@ async function loadDevices(page = 1) {
         
         if (statusFilter) {
             url += `&status=${statusFilter}`;
+        }
+        
+        if (deviceTypeFilter) {
+            url += `&deviceType=${deviceTypeFilter}`;
         }
         
         const response = await fetch(url);
@@ -105,29 +110,31 @@ function renderDeviceTable(devices) {
     }
     
     const table = `
-        <table class="table">
+        <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>设备ID</th>
+                    <th>设备编码</th>
                     <th>设备名称</th>
                     <th>设备类型</th>
-                    <th>状态</th>
-                    <th>安装位置</th>
-                    <th>负责人</th>
-                    <th>联系电话</th>
+                    <th>设备型号</th>
+                    <th>生产厂商</th>
+                    <th>在线状态</th>
+                    <th>设备状态</th>
+                    <th>安装日期</th>
                     <th>操作</th>
                 </tr>
             </thead>
             <tbody>
                 ${devices.map(device => `
                     <tr>
-                        <td>${device.deviceId || '-'}</td>
+                        <td>${device.deviceCode || '-'}</td>
                         <td>${device.deviceName || '-'}</td>
-                        <td>${device.deviceType || '-'}</td>
+                        <td>${getDeviceTypeText(device.deviceType)}</td>
+                        <td>${device.deviceModel || '-'}</td>
+                        <td>${device.manufacturer || '-'}</td>
+                        <td><span class="status ${device.onlineStatus === 1 ? 'status-1' : 'status-0'}">${device.onlineStatus === 1 ? '在线' : '离线'}</span></td>
                         <td><span class="status status-${device.status}">${getStatusText(device.status)}</span></td>
-                        <td>${device.location || '-'}</td>
-                        <td>${device.responsiblePerson || '-'}</td>
-                        <td>${device.contactPhone || '-'}</td>
+                        <td>${device.installDate || '-'}</td>
                         <td>
                             <button class="btn btn-warning btn-sm" onclick="editDevice(${device.id})">编辑</button>
                             <button class="btn btn-danger btn-sm" onclick="deleteDevice(${device.id}, '${device.deviceName}')">删除</button>
@@ -144,11 +151,22 @@ function renderDeviceTable(devices) {
 // 获取状态文本
 function getStatusText(status) {
     const statusMap = {
-        'online': '在线',
-        'offline': '离线',
-        'maintenance': '维护中'
+        1: '正常',
+        0: '停用',
+        2: '维修'
     };
-    return statusMap[status] || status;
+    return statusMap[status] || '未知';
+}
+
+// 获取设备类型文本
+function getDeviceTypeText(deviceType) {
+    const typeMap = {
+        'water': '水表',
+        'electric': '电表',
+        'gas': '气表',
+        'heat': '热表'
+    };
+    return typeMap[deviceType] || deviceType || '-';
 }
 
 // 渲染分页
@@ -190,6 +208,7 @@ function searchDevices() {
 function refreshDevices() {
     document.getElementById('searchInput').value = '';
     document.getElementById('statusFilter').value = '';
+    document.getElementById('deviceTypeFilter').value = '';
     loadDevices(1);
 }
 
@@ -199,7 +218,7 @@ function openAddModal() {
     currentEditId = null;
     document.getElementById('modalTitle').textContent = '新增设备';
     document.getElementById('deviceForm').reset();
-    document.getElementById('deviceId').disabled = false;
+    document.getElementById('deviceCode').disabled = false;
     document.getElementById('deviceModal').style.display = 'block';
 }
 
@@ -218,27 +237,24 @@ async function editDevice(id) {
             
             // 填充表单
             document.getElementById('deviceIdHidden').value = device.id;
-            document.getElementById('deviceId').value = device.deviceId || '';
+            document.getElementById('deviceCode').value = device.deviceCode || '';
             document.getElementById('deviceName').value = device.deviceName || '';
             document.getElementById('deviceType').value = device.deviceType || '';
             document.getElementById('deviceModel').value = device.deviceModel || '';
             document.getElementById('manufacturer').value = device.manufacturer || '';
-            document.getElementById('installationDate').value = device.installationDate || '';
-            document.getElementById('status').value = device.status || 'online';
-            document.getElementById('location').value = device.location || '';
-            document.getElementById('ratedPower').value = device.ratedPower || '';
-            document.getElementById('ratedVoltage').value = device.ratedVoltage || '';
-            document.getElementById('ratedCurrent').value = device.ratedCurrent || '';
-            document.getElementById('areaCode').value = device.areaCode || '';
-            document.getElementById('areaName').value = device.areaName || '';
-            document.getElementById('responsiblePerson').value = device.responsiblePerson || '';
-            document.getElementById('contactPhone').value = device.contactPhone || '';
-            document.getElementById('maintenanceCycle').value = device.maintenanceCycle || '';
-            document.getElementById('warrantyUntil').value = device.warrantyUntil || '';
+            document.getElementById('installDate').value = device.installDate || '';
+            document.getElementById('deviceAddr').value = device.deviceAddr || '';
+            document.getElementById('communicationProtocol').value = device.communicationProtocol || '';
+            document.getElementById('collectInterval').value = device.collectInterval || '';
+            document.getElementById('unit').value = device.unit || '';
+            document.getElementById('precisionDigits').value = device.precisionDigits || '';
+            document.getElementById('multiplier').value = device.multiplier || '';
+            document.getElementById('initialValue').value = device.initialValue || '';
+            document.getElementById('status').value = device.status || 1;
             document.getElementById('remark').value = device.remark || '';
             
-            // 编辑模式下设备ID不可修改
-            document.getElementById('deviceId').disabled = true;
+            // 编辑模式下设备编码不可修改
+            document.getElementById('deviceCode').disabled = true;
             
             document.getElementById('deviceModal').style.display = 'block';
         } else {
@@ -257,23 +273,20 @@ async function saveDevice() {
         const formData = new FormData(form);
         
         const deviceData = {
-            deviceId: formData.get('deviceId'),
+            deviceCode: formData.get('deviceCode'),
             deviceName: formData.get('deviceName'),
             deviceType: formData.get('deviceType'),
             deviceModel: formData.get('deviceModel'),
             manufacturer: formData.get('manufacturer'),
-            installationDate: formData.get('installationDate'),
-            status: formData.get('status'),
-            location: formData.get('location'),
-            ratedPower: formData.get('ratedPower') ? parseFloat(formData.get('ratedPower')) : null,
-            ratedVoltage: formData.get('ratedVoltage') ? parseFloat(formData.get('ratedVoltage')) : null,
-            ratedCurrent: formData.get('ratedCurrent') ? parseFloat(formData.get('ratedCurrent')) : null,
-            areaCode: formData.get('areaCode'),
-            areaName: formData.get('areaName'),
-            responsiblePerson: formData.get('responsiblePerson'),
-            contactPhone: formData.get('contactPhone'),
-            maintenanceCycle: formData.get('maintenanceCycle') ? parseInt(formData.get('maintenanceCycle')) : null,
-            warrantyUntil: formData.get('warrantyUntil'),
+            installDate: formData.get('installDate'),
+            deviceAddr: formData.get('deviceAddr'),
+            communicationProtocol: formData.get('communicationProtocol'),
+            collectInterval: formData.get('collectInterval') ? parseInt(formData.get('collectInterval')) : null,
+            unit: formData.get('unit'),
+            precisionDigits: formData.get('precisionDigits') ? parseInt(formData.get('precisionDigits')) : null,
+            multiplier: formData.get('multiplier') ? parseFloat(formData.get('multiplier')) : null,
+            initialValue: formData.get('initialValue') ? parseFloat(formData.get('initialValue')) : null,
+            status: parseInt(formData.get('status')),
             remark: formData.get('remark')
         };
         

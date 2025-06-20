@@ -163,9 +163,22 @@ public class RegionService extends ServiceImpl<RegionMapper, Region> {
         }
 
         // 检查区域编码是否重复（排除自己）
-        Region codeCheckRegion = baseMapper.findByRegionCode(regionDTO.getRegionCode());
-        if (codeCheckRegion != null && !codeCheckRegion.getId().equals(id)) {
+        Region codeCheckRegion = baseMapper.findByRegionCodeExcludeId(regionDTO.getRegionCode(), id);
+        if (codeCheckRegion != null) {
             throw new RuntimeException("区域编码已存在");
+        }
+
+        // 检查父区域设置是否会造成循环引用
+        if (regionDTO.getParentId() != null) {
+            if (regionDTO.getParentId().equals(id)) {
+                throw new RuntimeException("不能将自己设置为父区域");
+            }
+            
+            // 检查是否试图将父区域设置为自己的子区域
+            Set<Long> childrenIds = selectChildrenIds(id);
+            if (childrenIds.contains(regionDTO.getParentId())) {
+                throw new RuntimeException("不能将子区域设置为父区域，这会造成循环引用");
+            }
         }
 
         Region region = BeanUtil.copyProperties(regionDTO, Region.class);
@@ -189,7 +202,7 @@ public class RegionService extends ServiceImpl<RegionMapper, Region> {
         // 检查是否有子区域
         List<Region> children = baseMapper.findByParentId(id);
         if (!children.isEmpty()) {
-            throw new RuntimeException("存在子区域，无法删除");
+            throw new RuntimeException("存在子区域，无法删除。请先删除所有子区域。");
         }
 
         // 检查是否有关联设备
@@ -197,7 +210,7 @@ public class RegionService extends ServiceImpl<RegionMapper, Region> {
                 new QueryWrapper<com.kfblue.seh.entity.Device>().eq("region_id", id)
         );
         if (deviceCount > 0) {
-            throw new RuntimeException("存在关联设备，无法删除");
+            throw new RuntimeException("存在关联设备，无法删除。请先移除所有关联设备。");
         }
 
         return removeById(id);

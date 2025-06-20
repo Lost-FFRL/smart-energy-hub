@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备管理 - 智慧能源管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+        .status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .status-1 {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-0 {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .status-2 {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1050;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-dialog {
+            position: relative;
+            width: auto;
+            margin: 1.75rem auto;
+            max-width: 800px;
+        }
+        .modal-content {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .modal-header {
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 15px 15px 0 0;
+        }
+        .modal-footer {
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 15px 15px;
+        }
+        .form-floating label {
+            color: #6c757d;
+        }
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .pagination button {
+            margin: 0 2px;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            background-color: white;
+            color: #495057;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .pagination button:hover:not(:disabled) {
+            background-color: #e9ecef;
+        }
+        .pagination button.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .device-type-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .device-type-water {
+            background-color: #cce5ff;
+            color: #0066cc;
+        }
+        .device-type-electric {
+            background-color: #fff2cc;
+            color: #cc9900;
+        }
+        .device-type-gas {
+            background-color: #ffe6cc;
+            color: #cc6600;
+        }
+        .device-type-heat {
+            background-color: #ffcccc;
+            color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <nav class="sidebar d-flex flex-column p-3">
+        <div class="d-flex align-items-center mb-4">
+            <i class="bi bi-lightning-charge-fill me-2 fs-4"></i>
+            <span class="fs-5 fw-bold">智慧能源管理</span>
+        </div>
+        
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a href="/dashboard" class="nav-link">
+                    <i class="bi bi-speedometer2 me-2"></i>
+                    控制台
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/region-management" class="nav-link">
+                    <i class="bi bi-geo-alt me-2"></i>
+                    区域管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/device-management" class="nav-link active">
+                    <i class="bi bi-cpu me-2"></i>
+                    设备管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/energy-analysis" class="nav-link">
+                    <i class="bi bi-bar-chart me-2"></i>
+                    能耗分析
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="/energy-query" class="nav-link">
+                    <i class="bi bi-search me-2"></i>
+                    能耗查询
+                </a>
+            </li>
+        </ul>
+        
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-person-circle me-2"></i>
+                <span id="userWelcome">用户</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                <li><a class="dropdown-item" href="#" onclick="logout()">退出登录</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容区域 -->
+    <main class="main-content">
+        <div class="container-fluid">
+            <!-- 页面标题 -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="bi bi-cpu me-2 text-primary"></i>
+                    设备管理
+                </h2>
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="bi bi-plus-lg me-1"></i>
+                    新增设备
+                </button>
+            </div>
+
+            <!-- 搜索和筛选区域 -->
+            <div class="search-section">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="searchInput" placeholder="搜索设备...">
+                            <label for="searchInput">搜索设备编码或名称</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <select class="form-select" id="statusFilter">
+                                <option value="">全部状态</option>
+                                <option value="1">正常</option>
+                                <option value="0">停用</option>
+                                <option value="2">维修</option>
+                            </select>
+                            <label for="statusFilter">设备状态</label>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <select class="form-select" id="deviceTypeFilter">
+                                <option value="">全部类型</option>
+                                <option value="water">水表</option>
+                                <option value="electric">电表</option>
+                                <option value="gas">气表</option>
+                                <option value="heat">热表</option>
+                            </select>
+                            <label for="deviceTypeFilter">设备类型</label>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100 h-100" onclick="searchDevices()">
+                            <i class="bi bi-search me-1"></i>
+                            搜索
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button class="btn btn-outline-secondary" onclick="refreshDevices()">
+                            <i class="bi bi-arrow-clockwise me-1"></i>
+                            刷新
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 设备列表 -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-list-ul me-2"></i>
+                        设备列表
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div id="deviceTableContainer">
+                        <!-- 设备表格将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 分页 -->
+            <div id="pagination" class="pagination">
+                <!-- 分页按钮将在这里动态生成 -->
+            </div>
+        </div>
+    </main>
+
+    <!-- 设备编辑模态框 -->
+    <div id="deviceModal" class="modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">新增设备</h5>
+                    <button type="button" class="btn-close" onclick="closeModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="deviceForm">
+                        <input type="hidden" id="deviceIdHidden" name="id">
+                        
+                        <div class="row g-3">
+                            <!-- 基本信息 -->
+                            <div class="col-12">
+                                <h6 class="text-muted mb-3">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    基本信息
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="deviceCode" name="deviceCode" required>
+                                    <label for="deviceCode">设备编码 *</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="deviceName" name="deviceName" required>
+                                    <label for="deviceName">设备名称 *</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="deviceType" name="deviceType" required>
+                                        <option value="">请选择设备类型</option>
+                                        <option value="water">水表</option>
+                                        <option value="electric">电表</option>
+                                        <option value="gas">气表</option>
+                                        <option value="heat">热表</option>
+                                    </select>
+                                    <label for="deviceType">设备类型 *</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="deviceModel" name="deviceModel">
+                                    <label for="deviceModel">设备型号</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="manufacturer" name="manufacturer">
+                                    <label for="manufacturer">生产厂商</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="date" class="form-control" id="installDate" name="installDate">
+                                    <label for="installDate">安装日期</label>
+                                </div>
+                            </div>
+                            
+                            <!-- 技术参数 -->
+                            <div class="col-12 mt-4">
+                                <h6 class="text-muted mb-3">
+                                    <i class="bi bi-gear me-1"></i>
+                                    技术参数
+                                </h6>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="deviceAddr" name="deviceAddr">
+                                    <label for="deviceAddr">设备地址</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="communicationProtocol" name="communicationProtocol">
+                                        <option value="">请选择通信协议</option>
+                                        <option value="modbus">Modbus</option>
+                                        <option value="mqtt">MQTT</option>
+                                        <option value="http">HTTP</option>
+                                        <option value="tcp">TCP</option>
+                                    </select>
+                                    <label for="communicationProtocol">通信协议</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="collectInterval" name="collectInterval" min="1">
+                                    <label for="collectInterval">采集间隔(秒)</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="unit" name="unit">
+                                    <label for="unit">计量单位</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="precisionDigits" name="precisionDigits" min="0" max="6">
+                                    <label for="precisionDigits">精度位数</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="multiplier" name="multiplier" step="0.01">
+                                    <label for="multiplier">倍率系数</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" id="initialValue" name="initialValue" step="0.01">
+                                    <label for="initialValue">初始值</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <select class="form-select" id="status" name="status">
+                                        <option value="1">正常</option>
+                                        <option value="0">停用</option>
+                                        <option value="2">维修</option>
+                                    </select>
+                                    <label for="status">设备状态</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" id="remark" name="remark" style="height: 80px"></textarea>
+                                    <label for="remark">备注信息</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="saveDevice()">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/device-management.js"></script>
+</body>
+</html>

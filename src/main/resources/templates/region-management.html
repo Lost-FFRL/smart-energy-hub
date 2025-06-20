@@ -161,7 +161,7 @@
 
         <!-- 主内容区域 -->
         <main class="main-content flex-grow-1">
-            <div id="app" class="container-fluid p-4">
+            <div class="container-fluid p-4">
                 <!-- 页面标题 -->
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div>
@@ -338,8 +338,29 @@
                     </div>
                 </div>
             </div>
-            </div>
         </main>
+    </div>
+
+    <!-- 优雅的提示框 -->
+    <div id="toast-container" class="position-fixed top-50 start-50 translate-middle" style="z-index: 11000;">
+        <div id="success-toast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle me-2"></i>
+                    <span id="success-message">操作成功</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <div id="error-toast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span id="error-message">操作失败</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
     </div>
 
     <!-- 新增/编辑区域对话框 -->
@@ -369,10 +390,10 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <select class="form-select" id="parentId" v-model="regionForm.parentId">
-                                        <option value="">无父区域（顶级区域）</option>
-                                        <option v-for="region in flatRegionList" :key="region.id" :value="region.id">
-                                            {{ '　'.repeat(region.regionLevel - 1) }}{{ region.regionName }}
+                                    <select class="form-select" id="parentId" v-model="regionForm.parentId" @change="updateRegionLevel">
+                                        <option :value="null">无父区域（顶级区域）</option>
+                                        <option v-for="region in getAvailableParentRegions()" :key="region.id" :value="region.id">
+                                            {{ '　'.repeat(region.regionLevel - 1) + region.regionName }}
                                         </option>
                                     </select>
                                     <label for="parentId">父区域</label>
@@ -393,8 +414,8 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-floating mb-3">
-                                    <input type="number" class="form-control" id="regionLevel" v-model="regionForm.regionLevel" required min="1">
-                                    <label for="regionLevel">区域层级 *</label>
+                                    <input type="number" class="form-control" id="regionLevel" v-model="regionForm.regionLevel" required min="1" readonly>
+                                    <label for="regionLevel">区域层级 *（自动设置）</label>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -431,8 +452,9 @@
 
     <!-- 引入脚本 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios@1.5.0/dist/axios.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.3.4/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios@1.5.0/dist/axios.min.js"></script>
+<script src="/common-utils.js"></script>
     <script>
         // 区域树节点组件
         const RegionTreeNode = {
@@ -516,9 +538,9 @@
                     regionForm: {
                         regionCode: '',
                         regionName: '',
-                        parentId: '',
+                        parentId: null,
                         regionLevel: 1,
-                        areaSize: '',
+                        areaSize: null,
                         regionType: 'office',
                         status: 1,
                         remark: ''
@@ -535,12 +557,17 @@
                 async loadRegionTree() {
                     try {
                         const response = await axios.get('/api/regions/tree');
-                        this.regionTree = response.data.data || [];
-                        this.filteredRegionTree = [...this.regionTree];
-                        this.buildFlatRegionList();
+                        if (response.data && response.data.code === 200) {
+                            this.regionTree = response.data.data || [];
+                            this.filteredRegionTree = [...this.regionTree];
+                            this.buildFlatRegionList();
+                        } else {
+                            console.error('加载区域树失败:', response.data.message);
+                            // 静默处理，不显示错误提示
+                        }
                     } catch (error) {
                         console.error('加载区域树失败:', error);
-                        alert('加载区域树失败');
+                        // 静默处理，不显示错误提示
                     }
                 },
 
@@ -548,10 +575,15 @@
                     this.selectedRegionId = regionId;
                     try {
                         const response = await axios.get(`/api/regions/${regionId}`);
-                        this.selectedRegion = response.data.data;
+                        if (response.data && response.data.code === 200) {
+                            this.selectedRegion = response.data.data;
+                        } else {
+                            console.error('加载区域详情失败:', response.data.message);
+                            // 静默处理，不显示错误提示
+                        }
                     } catch (error) {
                         console.error('加载区域详情失败:', error);
-                        alert('加载区域详情失败');
+                        // 静默处理，不显示错误提示
                     }
                 },
                 showCreateDialog(parentId = null) {
@@ -559,14 +591,17 @@
                     this.regionForm = {
                         regionCode: '',
                         regionName: '',
-                        parentId: parentId || '',
-                        regionLevel: parentId ? this.getRegionLevel(parentId) + 1 : 1,
-                        areaSize: '',
+                        parentId: parentId || null,
+                        regionLevel: 1,
+                        areaSize: null,
                         regionType: 'office',
                         status: 1,
                         remark: ''
                     };
-                    this.modal.show();
+                    this.updateRegionLevel();
+                    this.$nextTick(() => {
+                        this.modal.show();
+                    });
                 },
                 showEditDialog(region) {
                     this.isEdit = true;
@@ -575,9 +610,9 @@
                     this.regionForm = {
                         regionCode: region.regionCode,
                         regionName: region.regionName,
-                        parentId: region.parentId || '',
+                        parentId: region.parentId || null,
                         regionLevel: region.regionLevel,
-                        areaSize: region.areaSize || '',
+                        areaSize: region.areaSize || null,
                         regionType: region.regionType,
                         status: region.status,
                         remark: region.remark || ''
@@ -586,19 +621,34 @@
                 },
                 async saveRegion() {
                     try {
+                        // 处理数据，确保空值转换为null
+                        const formData = {
+                            ...this.regionForm,
+                            parentId: this.regionForm.parentId || null,
+                            areaSize: this.regionForm.areaSize ? parseFloat(this.regionForm.areaSize) : null,
+                            regionLevel: parseInt(this.regionForm.regionLevel) || 1
+                        };
+                        
                         if (this.isEdit) {
-                            await axios.put(`/api/regions/${this.selectedRegion.id}`, this.regionForm);
-                            alert('更新区域成功');
+                            await CommonUtils.apiRequest(
+                                { method: 'put', url: `/api/regions/${this.selectedRegion.id}`, data: formData },
+                                '更新区域成功',
+                                '更新区域失败',
+                                (message) => this.showSuccessToast(message)
+                            );
                         } else {
-                            await axios.post('/api/regions', this.regionForm);
-                            alert('创建区域成功');
+                            await CommonUtils.apiRequest(
+                                { method: 'post', url: '/api/regions', data: formData },
+                                '创建区域成功',
+                                '创建区域失败',
+                                (message) => this.showSuccessToast(message)
+                            );
                         }
                         this.modal.hide();
                         this.loadRegionTree();
 
                     } catch (error) {
-                        console.error('保存区域失败:', error);
-                        alert('保存区域失败: ' + (error.response?.data?.msg || error.message));
+                        // 错误已在 CommonUtils.apiRequest 中处理
                     }
                 },
                 async deleteRegion(regionId) {
@@ -606,8 +656,12 @@
                         return;
                     }
                     try {
-                        await axios.delete(`/api/regions/${regionId}`);
-                        alert('删除区域成功');
+                        await CommonUtils.apiRequest(
+                            { method: 'delete', url: `/api/regions/${regionId}` },
+                            '删除区域成功',
+                            '删除区域失败',
+                            (message) => this.showSuccessToast(message)
+                        );
                         this.loadRegionTree();
 
                         if (this.selectedRegionId === regionId) {
@@ -615,8 +669,7 @@
                             this.selectedRegion = null;
                         }
                     } catch (error) {
-                        console.error('删除区域失败:', error);
-                        alert('删除区域失败: ' + (error.response?.data?.msg || error.message));
+                        // 错误已在 CommonUtils.apiRequest 中处理
                     }
                 },
                 refreshTree() {
@@ -659,6 +712,14 @@
                         }
                     });
                 },
+                updateRegionLevel() {
+                    if (this.regionForm.parentId) {
+                        const parentRegion = this.flatRegionList.find(r => r.id === this.regionForm.parentId);
+                        this.regionForm.regionLevel = parentRegion ? parentRegion.regionLevel + 1 : 1;
+                    } else {
+                        this.regionForm.regionLevel = 1;
+                    }
+                },
                 getRegionLevel(regionId) {
                     const region = this.flatRegionList.find(r => r.id === regionId);
                     return region ? region.regionLevel : 0;
@@ -685,9 +746,48 @@
                 formatDate(dateString) {
                     if (!dateString) return '未知';
                     return new Date(dateString).toLocaleString('zh-CN');
+                },
+                showSuccessToast(message) {
+                    document.getElementById('success-message').textContent = message;
+                    const toast = new bootstrap.Toast(document.getElementById('success-toast'), {
+                        autohide: true,
+                        delay: 3000
+                    });
+                    toast.show();
+                },
+                showErrorToast(message) {
+                    document.getElementById('error-message').textContent = message;
+                    const toast = new bootstrap.Toast(document.getElementById('error-toast'), {
+                        autohide: true,
+                        delay: 5000
+                    });
+                    toast.show();
+                },
+                getAvailableParentRegions() {
+                    if (!this.isEdit) {
+                        // 新增时，所有区域都可以作为父区域
+                        return this.flatRegionList;
+                    }
+                    
+                    // 编辑时，排除自己和自己的所有子区域
+                     const currentRegionId = this.regionForm.id;
+                    const excludeIds = new Set([currentRegionId]);
+                    
+                    // 递归收集所有子区域ID
+                    const collectChildrenIds = (regionId) => {
+                        const children = this.flatRegionList.filter(r => r.parentId === regionId);
+                        children.forEach(child => {
+                            excludeIds.add(child.id);
+                            collectChildrenIds(child.id);
+                        });
+                    };
+                    
+                    collectChildrenIds(currentRegionId);
+                    
+                    return this.flatRegionList.filter(region => !excludeIds.has(region.id));
                 }
             }
-        }).mount('#app');
+        }).mount('body');
     </script>
 </body>
 </html>

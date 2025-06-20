@@ -49,16 +49,108 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 处理业务异常（RuntimeException）
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public Object handleRuntimeException(RuntimeException e, HttpServletRequest request) {
+        log.warn("业务异常: {}, 请求路径: {}", e.getMessage(), request.getRequestURI());
+        
+        // 判断是否为API请求
+        String requestedWith = request.getHeader("X-Requested-With");
+        String contentType = request.getHeader("Content-Type");
+        String accept = request.getHeader("Accept");
+        
+        boolean isApiRequest = "XMLHttpRequest".equals(requestedWith) 
+                || (contentType != null && contentType.contains("application/json"))
+                || (accept != null && accept.contains("application/json"))
+                || request.getRequestURI().startsWith("/api/");
+        
+        if (isApiRequest) {
+            // API请求，返回JSON响应
+            return ResponseEntity.ok(Result.error(e.getMessage()));
+        } else {
+            // 普通页面请求，重定向到首页
+            ModelAndView mv = new ModelAndView();
+            mv.setViewName("redirect:/");
+            return mv;
+        }
+    }
+
+    /**
      * 处理其他未捕获的异常
      * 避免显示默认的Whitelabel Error Page
      */
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleGenericException(Exception e, HttpServletRequest request) {
-        log.error("系统异常: {}, 请求路径: {}", e.getMessage(), request.getRequestURI(), e);
+    public Object handleGenericException(Exception e, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
         
-        // 重定向到首页，避免显示错误页面
-        ModelAndView mv = new ModelAndView();
-        mv.setViewName("redirect:/");
-        return mv;
+        // 检查是否是静态资源请求，如果是则不处理，让Spring Boot默认机制处理
+        if (isStaticResourceRequest(requestURI)) {
+            log.debug("静态资源请求异常，不进行全局处理: {}", requestURI);
+            // 返回null让Spring Boot的默认错误处理机制处理
+            throw new RuntimeException(e);
+        }
+        
+        log.error("系统异常: {}, 请求路径: {}", e.getMessage(), requestURI, e);
+        
+        // 判断是否为API请求
+        String requestedWith = request.getHeader("X-Requested-With");
+        String contentType = request.getHeader("Content-Type");
+        String accept = request.getHeader("Accept");
+        
+        boolean isApiRequest = "XMLHttpRequest".equals(requestedWith) 
+                || (contentType != null && contentType.contains("application/json"))
+                || (accept != null && accept.contains("application/json"))
+                || requestURI.startsWith("/api/");
+        
+        if (isApiRequest) {
+            // API请求，返回JSON响应
+            return ResponseEntity.ok(Result.error("系统异常，请稍后重试"));
+        } else {
+            // 普通页面请求，重定向到首页
+            ModelAndView mv = new ModelAndView();
+            mv.setViewName("redirect:/");
+            return mv;
+        }
+    }
+    
+    /**
+     * 判断是否是静态资源请求
+     * @param requestURI 请求URI
+     * @return 是否是静态资源请求
+     */
+    private boolean isStaticResourceRequest(String requestURI) {
+        if (requestURI == null) {
+            return false;
+        }
+        
+        // 常见的静态资源路径和文件扩展名
+        String[] staticPaths = {
+            "/favicon.ico", "/robots.txt", "/sitemap.xml",
+            "/static/", "/css/", "/js/", "/images/", "/img/", "/fonts/"
+        };
+        
+        String[] staticExtensions = {
+            ".css", ".js", ".ico", ".png", ".jpg", ".jpeg", ".gif", ".svg",
+            ".woff", ".woff2", ".ttf", ".eot", ".map", ".webp"
+        };
+        
+        String lowerURI = requestURI.toLowerCase();
+        
+        // 检查是否匹配静态资源路径
+        for (String path : staticPaths) {
+            if (lowerURI.startsWith(path)) {
+                return true;
+            }
+        }
+        
+        // 检查是否匹配静态资源扩展名
+        for (String ext : staticExtensions) {
+            if (lowerURI.endsWith(ext)) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }

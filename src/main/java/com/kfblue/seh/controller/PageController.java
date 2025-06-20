@@ -56,20 +56,13 @@ public class PageController {
     /**
      * 设备管理页面
      */
-    @GetMapping("/admin/device")
+    @GetMapping("/device-management")
     public String deviceManagement(Model model) {
         StpUtil.checkLogin();
-        return "admin/device/list";
+        return "device-management";
     }
     
-    /**
-     * 区域管理页面
-     */
-    @GetMapping("/admin/area")
-    public String areaManagement(Model model) {
-        StpUtil.checkLogin();
-        return "region-management";
-    }
+
     
     /**
      * 系统配置页面

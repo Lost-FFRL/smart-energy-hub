@@ -12,8 +12,11 @@ public interface RegionMapper extends BaseMapper<Region> {
     @Select("SELECT * FROM regions WHERE parent_id = #{parentId} AND deleted = 0 ORDER BY region_code")
     List<Region> findByParentId(@Param("parentId") Long parentId);
 
-    @Select("SELECT * FROM regions WHERE region_code = #{regionCode} AND deleted = 0")
+    @Select("SELECT * FROM regions WHERE region_code = #{regionCode}")
     Region findByRegionCode(@Param("regionCode") String regionCode);
+
+    @Select("SELECT * FROM regions WHERE region_code = #{regionCode} AND id != #{excludeId}")
+    Region findByRegionCodeExcludeId(@Param("regionCode") String regionCode, @Param("excludeId") Long excludeId);
 
     @Select("SELECT * FROM regions WHERE region_type = #{regionType} AND deleted = 0 ORDER BY region_level, region_code")
     List<Region> findByRegionType(@Param("regionType") String regionType);
