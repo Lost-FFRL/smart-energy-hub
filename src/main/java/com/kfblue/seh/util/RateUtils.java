@@ -70,4 +70,39 @@ public class RateUtils {
         // 保留2位小数
         return rate.setScale(2, RoundingMode.HALF_UP);
     }
+
+    /**
+     * 直接计算百分比，支持 BigDecimal 类型
+     *
+     * @param numerator   分子
+     * @param denominator 分母
+     * @return 百分比，null表示无法计算
+     */
+    public static BigDecimal calculatePercentage(BigDecimal numerator, BigDecimal denominator) {
+        // 处理 null 值
+        if (numerator == null) {
+            numerator = BigDecimal.ZERO;
+        }
+        if (denominator == null) {
+            denominator = BigDecimal.ZERO;
+        }
+
+        // 处理分母为0的情况
+        if (BigDecimal.ZERO.compareTo(denominator) == 0) {
+            if (BigDecimal.ZERO.compareTo(numerator) == 0) {
+                return BigDecimal.ZERO; // 0/0 = 0%
+            } else {
+                return null; // 有值/0 = 无法计算百分比，前端显示为 "N/A"
+            }
+        }
+
+        // 正常计算：分子 / 分母 * 100
+        BigDecimal percentage = numerator
+                .divide(denominator, 4, RoundingMode.HALF_UP)
+                .multiply(new BigDecimal("100"));
+
+        // 保留2位小数
+        return percentage.setScale(2, RoundingMode.HALF_UP);
+    }
+
 }

@@ -30,6 +30,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
                     .notMatch("/api/energy/**")
                     // 排除区域相关查询接口（无需登录）
                     .notMatch("/api/regions/**")
+                    .notMatch("/api/device/monitor/**")
                     // 排除测试接口
                     .notMatch("/api/test/**")
                     .notMatch("/static/**")       // 排除静态资源
