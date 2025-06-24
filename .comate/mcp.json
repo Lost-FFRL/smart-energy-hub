@@ -1,16 +1,21 @@
 {
     "mcpServers": {
-        "maven": {
+        "gitee": {
             "command": "npx",
             "args": [
-                "mcp-maven-deps"
-            ]
+                "-y",
+                "@gitee/mcp-gitee@latest"
+            ],
+            "env": {
+                "GITEE_API_BASE": "https://gitee.com/api/v5",
+                "GITEE_ACCESS_TOKEN": "<your personal access token>"
+            }
         },
         "mysql": {
             "command": "uv",
             "args": [
                 "--directory",
-                "path/to/mysql_mcp_server",
+                "/Users/mk/Workspaces/mcp-servers/mysql_mcp_server",
                 "run",
                 "mysql_mcp_server"
             ],
@@ -19,8 +24,32 @@
                 "MYSQL_PORT": "3306",
                 "MYSQL_USER": "root",
                 "MYSQL_PASSWORD": "local2026",
-                "MYSQL_DATABASE": "smart-energy-hub"
+                "MYSQL_DATABASE": "smart-energy-hub      "
+            },
+            "disabled": false
+        },
+        "github": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-github"
+            ],
+            "env": {
+                "GITHUB_PERSONAL_ACCESS_TOKEN": "<YOUR_TOKEN>"
             }
+        },
+        "sequential-thinking": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-sequential-thinking"
+            ]
+        },
+        "maven": {
+            "command": "npx",
+            "args": [
+                "mcp-maven-deps"
+            ]
         },
         "memory": {
             "command": "npx",
