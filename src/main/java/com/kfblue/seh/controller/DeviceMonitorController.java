@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Tag(name = "设备监控", description = "设备监控")
+@Tag(name = "设备监控-智慧照明系统", description = "设备监控")
 @RestController
 @RequestMapping("/api/device/monitor")
 @RequiredArgsConstructor
@@ -29,7 +29,7 @@ public class DeviceMonitorController {
     private final LightingDeviceService lightingDeviceService;
     private final LightingConfigService lightingConfigService;
 
-    @Operation(summary = "智慧照明系统-配电箱", description = "配电箱监控统计")
+    @Operation(summary = "配电箱", description = "配电箱监控统计")
     @GetMapping("/light/box")
     public Result<LightVO> lightBox() {
         // 获取灯箱设备统计数据
@@ -37,7 +37,7 @@ public class DeviceMonitorController {
         return Result.success(buildLightVO(statistics));
     }
 
-    @Operation(summary = "智慧照明系统-单灯状态", description = "单灯设备监控统计")
+    @Operation(summary = "单灯状态", description = "单灯设备监控统计")
     @GetMapping("/light/status")
     public Result<LightVO> lightStatus() {
         // 获取单灯设备统计数据
@@ -45,7 +45,7 @@ public class DeviceMonitorController {
         return Result.success(buildLightVO(statistics));
     }
 
-    @Operation(summary = "智慧照明系统-智能控制", description = "获取智能控制配置列表")
+    @Operation(summary = "智能控制", description = "获取智能控制配置列表")
     @GetMapping("/light/config")
     public Result<LightingConfigVO> lightConfig() {
         // 获取启用的智能控制配置
@@ -53,7 +53,7 @@ public class DeviceMonitorController {
         return Result.success(configs.stream().filter(config -> "longitude".equals(config.getControlMode())).findFirst().orElse(null));
     }
 
-    @Operation(summary = "智慧照明系统-单灯分页查询", description = "单灯分页查询")
+    @Operation(summary = "单灯分页查询", description = "单灯分页查询")
     @GetMapping("/light/page")
     public Result<IPage<LightDeviceSimpleVO>> lightPage(
             @Parameter(description = "当前页", example = "1") @RequestParam(defaultValue = "1") long current,
