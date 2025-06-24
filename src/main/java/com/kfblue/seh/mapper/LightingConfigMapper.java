@@ -22,6 +22,11 @@ public interface LightingConfigMapper extends BaseMapper<LightingConfig> {
      * @param controlMode 控制模式
      * @return 配置列表
      */
+    @org.apache.ibatis.annotations.Select("""
+        SELECT * FROM lighting_config 
+        WHERE deleted = 0 AND control_mode = #{controlMode}
+        ORDER BY created_at DESC
+        """)
     List<LightingConfig> selectByControlMode(@Param("controlMode") String controlMode);
 
     /**
@@ -30,6 +35,11 @@ public interface LightingConfigMapper extends BaseMapper<LightingConfig> {
      * @param regionId 区域ID
      * @return 配置列表
      */
+    @org.apache.ibatis.annotations.Select("""
+        SELECT * FROM lighting_config 
+        WHERE deleted = 0 AND (region_id = #{regionId} OR region_id IS NULL)
+        ORDER BY created_at DESC
+        """)
     List<LightingConfig> selectByRegionId(@Param("regionId") Long regionId);
 
     /**
@@ -38,6 +48,11 @@ public interface LightingConfigMapper extends BaseMapper<LightingConfig> {
      * @param deviceType 设备类型
      * @return 配置列表
      */
+    @org.apache.ibatis.annotations.Select("""
+        SELECT * FROM lighting_config 
+        WHERE deleted = 0 AND (device_type = #{deviceType} OR device_type IS NULL)
+        ORDER BY created_at DESC
+        """)
     List<LightingConfig> selectByDeviceType(@Param("deviceType") String deviceType);
 
     /**
@@ -45,6 +60,11 @@ public interface LightingConfigMapper extends BaseMapper<LightingConfig> {
      * 
      * @return 启用的配置列表
      */
+    @org.apache.ibatis.annotations.Select("""
+        SELECT * FROM lighting_config 
+        WHERE deleted = 0 AND is_enabled = 1
+        ORDER BY created_at DESC
+        """)
     List<LightingConfig> selectEnabledConfigs();
 
     /**
