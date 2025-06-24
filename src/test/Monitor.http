@@ -17,3 +17,10 @@ GET {{host}}/device/monitor/light/page?current=1&size=10&workStatus=1
 POST {{host}}/device/monitor/light/work?action=0&deviceId=1
 
 ###
+GET {{host}}/device/monitor/pumps
+
+###
+GET {{host}}/device/monitor/pumps/flow/1
+
+###
+GET {{host}}/device/monitor/pumps/level
