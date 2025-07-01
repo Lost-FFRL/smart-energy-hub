@@ -31,5 +31,43 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Application Logs ###
 /seh.log
 /nohup.out
+logs/
+*.log
+*.log.*
+*.gz
+
+### Configuration Files ###
+# 实际配置文件（包含敏感信息）
+application.properties
+application-dev.properties
+application-prod.properties
+application-test.properties
+
+### Environment Variables ###
+.env
+.env.local
+.env.production
+.env.test
+
+### Database Files ###
+*.db
+*.sqlite
+*.sqlite3
+
+### Backup Files ###
+*.bak
+*.backup
+*.orig
+
+### OS Generated Files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
